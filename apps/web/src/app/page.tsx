@@ -1,5 +1,6 @@
 import GoToActionButton from "@/components/go-to-action-button"
 import Logo from "@/components/logo"
+import Header from "@/components/header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Meteors from "@/components/ui/meteors"
@@ -134,6 +135,7 @@ export default function Home() {
       />
       
       <div className="flex min-h-screen flex-col relative z-10">
+        <Header />
         <header className="sticky top-0 z-50 w-full bg-[#0a0a0a]/80 backdrop-blur-sm border-b border-white/5">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between w-full">

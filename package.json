@@ -19,5 +19,14 @@
   "devDependencies": {
     "turbo": "^2.5.4"
   },
-  "packageManager": "pnpm@10.17.1"
+  "packageManager": "pnpm@10.17.1",
+  "pnpm": {
+    "packageExtensions": {
+      "@convex-dev/auth@*": {
+        "dependencies": {
+          "cookie": "^0.6.0"
+        }
+      }
+    }
+  }
 }
