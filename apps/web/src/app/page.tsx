@@ -4,10 +4,10 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Meteors from "@/components/ui/meteors"
 import { Highlighter } from "@/components/ui/highlighter"
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button"
 import {
   BarChart,
   BookOpen,
-  ChevronRight,
   Clock,
   Github,
   LineChart,
@@ -129,11 +129,11 @@ export default function Home() {
               and unlock your academic potential with AI-powered insights.
             </p>
             <div className="space-x-4">
-              <Button size="lg" className="rounded-full" asChild>
-                <Link href="/dashboard">
-                  Get Started <ChevronRight className="h-4 w-4" />
-                </Link>
-              </Button>
+              <Link href="/dashboard">
+                <InteractiveHoverButton className="rounded-full bg-blue-600 hover:bg-blue-700 text-white border-blue-600">
+                  Get Started
+                </InteractiveHoverButton>
+              </Link>
               <Button
                 size="lg"
                 variant="outline"
@@ -187,70 +187,65 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mx-auto py-20">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold sm:text-4xl text-white">
+        <section className="mx-auto py-20 px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold sm:text-4xl lg:text-5xl text-white mb-6">
               Everything you need to excel
             </h2>
-            <p className="mt-4 text-gray-300">
-              Comprehensive tools designed for serious students
+            <p className="text-lg text-gray-300 leading-relaxed">
+              Comprehensive tools designed for serious students who want to maximize their potential
             </p>
           </div>
 
-          <div className="grid items-center justify-center gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
             {features.map((feature, i) => (
               <div
                 key={i}
-                className="p-6 transition-all hover:-translate-y-1"
+                className="group relative p-8 rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:bg-white/[0.04] hover:border-white/10"
               >
-                <div className="mb-4 flex items-center gap-2">
-                  <div className="rounded-lg bg-blue-600/20 p-2 text-blue-400">
+                <div className="mb-6">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 text-white/70 group-hover:text-white group-hover:bg-white/10 transition-all duration-300">
                     {feature.icon}
                   </div>
                   {feature.badge && (
-                    <Badge variant="secondary" className="ml-auto bg-blue-600/20 text-blue-300 border-blue-400/30">
+                    <Badge variant="secondary" className="mt-2 bg-white/10 text-white/80 border-white/20 text-xs">
                       {feature.badge}
                     </Badge>
                   )}
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                <p className="text-gray-300">{feature.description}</p>
+                <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-white transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="border-t border-white/5">
-          <div className="py-20">
-            <div className="relative mx-auto max-w-4xl overflow-hidden">
-              <div className="absolute inset-0 z-10">
-                <Meteors number={10} />
+        <section className="py-20 sm:py-32">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <div className="relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-lg">
+              <div className="absolute inset-0 h-full w-full">
+                <Meteors number={30} />
               </div>
-              <div className="relative flex flex-col items-center gap-4 p-12 text-center z-20">
-                <LineChart className="h-12 w-12 text-blue-400" />
-                <h2 className="text-3xl font-bold sm:text-4xl text-white">
-                  Ready to <Highlighter 
-                    action="underline" 
-                    color="#8b5cf6" 
-                    strokeWidth={1.5}
-                    animationDuration={1000}
-                    isView={true}
-                    padding={1}
-                  >
-                    Transform Your Study Habits
-                  </Highlighter>?
+              <div className="relative z-10 p-12 text-center flex flex-col items-center">
+                <LineChart className="h-12 w-12 text-gray-800" />
+                <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mt-4">
+                  Ready to Transform Your Study Habits?
                 </h2>
-                <p className="max-w-[42rem] text-lg text-gray-300">
+                <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
                   Join thousands of students who are already improving their
-                  academic performance with StudyMate.
+                  academic performance with TopStudz.
                 </p>
-                <Button
-                  size="lg"
-                  className="mt-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white"
-                  asChild
-                >
-                  <Link href={"/dashboard"}>Start Your Journey</Link>
-                </Button>
+                <div className="mt-8">
+                  <Link href="/dashboard">
+                    <InteractiveHoverButton className="rounded-full border-gray-900 bg-gray-900 text-white hover:bg-gray-800">
+                      Start Your Journey
+                    </InteractiveHoverButton>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
