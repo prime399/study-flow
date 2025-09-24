@@ -144,13 +144,11 @@ export default function Home() {
         </header>
 
         <main className="relative flex-1">
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <Meteors number={2} />
-          </div>
+
         <section className="relative mx-auto space-y-6 sm:space-y-8 py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 z-20">
-          <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-            <Meteors number={2} />
-          </div>
+          {/* <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+            <Meteors number={4} />
+          </div> */}
           <div className="mx-auto flex max-w-[64rem] flex-col items-center gap-6 sm:gap-8 text-center relative z-20">
             <h1 className="text-pretty text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white leading-tight">
               Study. Connect. <Highlighter 
@@ -170,7 +168,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-4 items-center justify-center">
               <Link href="/dashboard">
-                <InteractiveHoverButton className="rounded-full bg-blue-600 hover:bg-blue-700 text-white border-blue-600 text-sm sm:text-base py-2 sm:py-3 px-6 sm:px-8">
+                <InteractiveHoverButton className="rounded-full bg-blue-600 hover:bg-white text-white border-blue-600 text-sm sm:text-base py-2 sm:py-3 px-6 sm:px-8">
                   Get Started
                 </InteractiveHoverButton>
               </Link>
@@ -226,6 +224,11 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Meteors Section */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <Meteors number={4} />
+        </div>
 
         <section className="mx-auto py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
           <div className="mb-12 sm:mb-16 text-center max-w-3xl mx-auto">
