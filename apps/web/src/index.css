@@ -122,6 +122,20 @@ body {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --animate-meteor: meteor 5s linear infinite;
+  @keyframes meteor {
+  0% {
+    transform: rotate(var(--angle)) translateX(0);
+    opacity: 1;
+    }
+  70% {
+    opacity: 1;
+    }
+  100% {
+    transform: rotate(var(--angle)) translateX(-500px);
+    opacity: 0;
+    }
+  }
 }
 
 @layer base {
@@ -130,5 +144,62 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@keyframes meteor {
+  0% {
+    transform: rotate(215deg) translateX(0);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(215deg) translateX(-800px);
+    opacity: 0;
+  }
+}
+
+.animate-meteor {
+  animation: meteor 5s linear infinite;
+}
+
+/* Custom MagicUI Highlighter styling for cosmic theme */
+.cosmic-highlighter {
+  background: linear-gradient(
+    135deg,
+    rgba(56, 189, 248, 0.3) 0%,
+    rgba(139, 92, 246, 0.2) 30%,
+    rgba(236, 72, 153, 0.15) 60%,
+    rgba(34, 197, 94, 0.1) 100%
+  );
+  border-radius: 4px;
+  padding: 2px 4px;
+  box-shadow: 
+    0 0 20px rgba(56, 189, 248, 0.15),
+    0 0 40px rgba(139, 92, 246, 0.1);
+  transition: all 0.3s ease;
+}
+
+.cosmic-highlighter:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(56, 189, 248, 0.4) 0%,
+    rgba(139, 92, 246, 0.3) 30%,
+    rgba(236, 72, 153, 0.25) 60%,
+    rgba(34, 197, 94, 0.2) 100%
+  );
+  box-shadow: 
+    0 0 30px rgba(56, 189, 248, 0.25),
+    0 0 60px rgba(139, 92, 246, 0.15);
+}
+
+@keyframes underline-wobble {
+  0% {
+    transform: scaleX(1) translateY(0);
+  }
+  100% {
+    transform: scaleX(1.02) translateY(1px); /* Slight organic movement */
   }
 }
