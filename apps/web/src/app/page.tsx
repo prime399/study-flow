@@ -145,11 +145,11 @@ export default function Home() {
 
         <main className="relative flex-1">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <Meteors number={20} />
+            <Meteors number={2} />
           </div>
         <section className="relative mx-auto space-y-6 sm:space-y-8 py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 z-20">
           <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-            <Meteors number={20} />
+            <Meteors number={2} />
           </div>
           <div className="mx-auto flex max-w-[64rem] flex-col items-center gap-6 sm:gap-8 text-center relative z-20">
             <h1 className="text-pretty text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white leading-tight">
@@ -339,7 +339,7 @@ export default function Home() {
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <div className="relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-lg">
               <div className="absolute inset-0 h-full w-full">
-                <Meteors number={30} />
+                <Meteors number={4} />
               </div>
               <div className="relative z-10 p-6 sm:p-8 lg:p-12 text-center flex flex-col items-center">
                 <LineChart className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-gray-800" />

@@ -123,19 +123,6 @@ body {
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --animate-meteor: meteor 5s linear infinite;
-  @keyframes meteor {
-  0% {
-    transform: rotate(var(--angle)) translateX(0);
-    opacity: 1;
-    }
-  70% {
-    opacity: 1;
-    }
-  100% {
-    transform: rotate(var(--angle)) translateX(-500px);
-    opacity: 0;
-    }
-  }
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite
 ;
@@ -167,20 +154,20 @@ body {
 
 @keyframes meteor {
   0% {
-    transform: rotate(215deg) translateX(0);
+    transform: rotate(0deg) translateX(0);
     opacity: 1;
   }
   70% {
     opacity: 1;
   }
   100% {
-    transform: rotate(215deg) translateX(-800px);
+    transform: rotate(50deg) translateX(-1000px);
     opacity: 0;
   }
 }
 
 .animate-meteor {
-  animation: meteor 5s linear infinite;
+  animation: meteor 3s linear infinite;
 }
 
 /* Custom MagicUI Highlighter styling for cosmic theme */
