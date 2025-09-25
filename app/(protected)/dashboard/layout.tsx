@@ -15,7 +15,7 @@ export default function DashboardLayout({
     <ConvexClientProvider>
       <NuqsAdapter>
         <SidebarProvider className="flex h-svh flex-col md:flex-row">
-          <Header />
+          <Header showSidebarTrigger />
           <MainSidebar />
           <main className="w-full bg-background">
             <ScrollArea className="h-full p-4">{children}</ScrollArea>
@@ -26,3 +26,4 @@ export default function DashboardLayout({
     </ConvexClientProvider>
   )
 }
+

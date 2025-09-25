@@ -52,6 +52,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.2",
     "recharts": "^2.15.0",
+    "rough-notation": "^0.5.1",
     "server-only": "^0.0.1",
     "sonner": "^1.7.2",
     "tailwind-merge": "^2.6.0",
