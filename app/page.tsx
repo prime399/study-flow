@@ -344,7 +344,7 @@ export default function Home() {
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <div className="relative overflow-hidden rounded-2xl bg-white border border-gray-200/50 shadow-lg">
               <div className="absolute inset-0 h-full w-full">
-                <Meteors number={4} />
+                <Meteors number={8} />
               </div>
               <div className="relative z-10 p-6 sm:p-8 lg:p-12 text-center flex flex-col items-center">
                 <LineChart className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-gray-800" />
