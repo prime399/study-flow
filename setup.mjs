@@ -54,6 +54,24 @@ const variables = JSON.stringify({
       ],
     },
     {
+      name: "Google OAuth",
+      help:
+        "Create OAuth credentials in the Google Cloud Console: " +
+        "https://console.cloud.google.com/apis/credentials\n\n" +
+        `Authorized redirect URI:\n\n` +
+        `  https://${deploymentName}.convex.site/api/auth/callback/google`,
+      variables: [
+        {
+          name: "AUTH_GOOGLE_ID",
+          description: "the Google OAuth Client ID",
+        },
+        {
+          name: "AUTH_GOOGLE_SECRET",
+          description: "the Google OAuth Client Secret",
+        },
+      ],
+    },
+    {
       name: "Resend",
       help: "Sign up for Resend at https://resend.com/signup. Then create an API Key.",
       variables: [
@@ -85,3 +103,8 @@ if (runOnceWorkflow) {
 }
 
 process.exit(result.status)
+
+
+
+
+

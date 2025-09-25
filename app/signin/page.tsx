@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card"
 import Image from "next/image"
 import githubLogo from "@/public/github-mark.svg"
+import googleLogo from "@/public/google-logo.svg"
 
 export default function SignInPage() {
   const { signIn } = useAuthActions()
@@ -25,7 +26,22 @@ export default function SignInPage() {
             become a top student.
           </CardDescription>
         </CardHeader>
-        <CardFooter>
+        <CardFooter className="flex w-full flex-col gap-2">
+          <Button
+            className="w-full"
+            variant="outline"
+            type="button"
+            onClick={() => void signIn("google", { redirectTo: "/dashboard" })}
+          >
+            <Image
+              className="mr-2"
+              src={googleLogo}
+              alt="Google Logo"
+              width={20}
+              height={20}
+            />
+            Sign in with Google
+          </Button>
           <Button
             className="w-full"
             variant="outline"
@@ -46,3 +62,7 @@ export default function SignInPage() {
     </div>
   )
 }
+
+
+
+
