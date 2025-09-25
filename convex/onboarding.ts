@@ -91,18 +91,29 @@ export const completeOnboarding = mutation({
 
 export const getSuggestedGroups = query({
   args: {
-    groupIds: v.array(v.id("groups")),
+    limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const suggestedGroups = await ctx.db
-      .query("groups")
-      .filter((q) =>
-        args.groupIds.length === 1
-          ? q.eq(q.field("_id"), args.groupIds[0])
-          : q.or(...args.groupIds.map((id) => q.eq(q.field("_id"), id))),
-      )
-      .collect()
+    const limit = Math.max(1, Math.min(args.limit ?? 4, 12))
 
-    return suggestedGroups
+    const groups = await ctx.db.query("groups").order("desc").take(limit)
+
+    const groupsWithMemberCounts = await Promise.all(
+      groups.map(async (group) => {
+        const members = await ctx.db
+          .query("groupMembers")
+          .withIndex("by_group")
+          .filter((q) => q.eq(q.field("groupId"), group._id))
+          .collect()
+
+        return {
+          ...group,
+          memberCount: members.length,
+        }
+      }),
+    )
+
+    return groupsWithMemberCounts
   },
 })
+

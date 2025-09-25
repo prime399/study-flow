@@ -52,12 +52,7 @@ function OnboardingDialog() {
   const [open, setOpen] = useState(true)
 
   const suggestedGroups = useQuery(api.onboarding.getSuggestedGroups, {
-    groupIds: [
-      "k975y74b3zqw62vskhc9vtwj1n75p1zt",
-      "k977sed8weg51fnq1mwqnr2zr575pxg4",
-      "k971tsmdn1yst3vqra7s2cgv3575mc3g",
-      "k97bbhhytbe6m5wg1n3qxt4ts975m9jz",
-    ] as Id<"groups">[],
+    limit: 4,
   })
   const completeOnboarding = useMutation(api.onboarding.completeOnboarding)
 
@@ -261,3 +256,4 @@ function GroupsSkeleton() {
     </div>
   )
 }
+
