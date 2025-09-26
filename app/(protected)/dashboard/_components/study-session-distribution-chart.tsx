@@ -97,6 +97,35 @@ export default function StudySessionDistribution({
 }) {
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
+  // Process data before any conditional returns
+  const processedData = React.useMemo(() => {
+    return recentSessions.reduce<ProcessedData>((acc, session) => {
+      const date = new Date(session.startTime).toISOString().split('T')[0]; // Use YYYY-MM-DD format
+      if (!acc[date]) {
+        acc[date] = { completed: 0, incomplete: 0 };
+      }
+      session.completed ? acc[date].completed++ : acc[date].incomplete++;
+      return acc;
+    }, {});
+  }, [recentSessions]);
+
+  const data: ChartDataPoint[] = React.useMemo(() => {
+    return Object.entries(processedData)
+      .map(([date, counts]) => ({
+        date,
+        completed: counts.completed,
+        incomplete: counts.incomplete,
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(-7); // Show last 7 days
+  }, [processedData]);
+
+  const activeData = React.useMemo(() => {
+    if (activeIndex === null) return null;
+    return data[activeIndex];
+  }, [activeIndex, data]);
+
+  // Early return after all hooks
   if (!recentSessions.length) {
     return (
       <Card className="h-[300px]">
@@ -115,29 +144,6 @@ export default function StudySessionDistribution({
       </Card>
     );
   }
-
-  const processedData = recentSessions.reduce<ProcessedData>((acc, session) => {
-    const date = new Date(session.startTime).toISOString().split('T')[0]; // Use YYYY-MM-DD format
-    if (!acc[date]) {
-      acc[date] = { completed: 0, incomplete: 0 };
-    }
-    session.completed ? acc[date].completed++ : acc[date].incomplete++;
-    return acc;
-  }, {});
-
-  const data: ChartDataPoint[] = Object.entries(processedData)
-    .map(([date, counts]) => ({
-      date,
-      completed: counts.completed,
-      incomplete: counts.incomplete,
-    }))
-    .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-    .slice(-7); // Show last 7 days
-
-  const activeData = React.useMemo(() => {
-    if (activeIndex === null) return null;
-    return data[activeIndex];
-  }, [activeIndex]);
 
   const totalCompleted = data.reduce((sum, item) => sum + item.completed, 0);
   const totalIncomplete = data.reduce((sum, item) => sum + item.incomplete, 0);
