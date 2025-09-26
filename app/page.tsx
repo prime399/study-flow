@@ -137,7 +137,7 @@ export default function Home() {
       
       <div className="flex min-h-screen flex-col relative z-10">
         <Header />
-        <header className="sticky top-0 z-50 w-full bg-[#0a0a0a]/80 backdrop-blur-sm border-b border-white/5">
+        <header className="sticky top-0 z-50 hidden w-full border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-sm md:block">
           <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between w-full">
               <Logo />

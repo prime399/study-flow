@@ -10,8 +10,8 @@ export default function Logo({
           Study<span className="text-blue-600">Mate</span>
         </h1>
       ) : (
-        <h1 className="text-2xl font-medium tracking-tight">
-          T<span className="text-blue-600">S</span>
+        <h1 className=" font-medium tracking-tight text-2xl ">
+          S<span className="text-blue-600">M</span>
         </h1>
       )}
     </div>
