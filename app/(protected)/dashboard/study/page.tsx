@@ -7,6 +7,7 @@ import { useMutation, useQuery } from "convex/react"
 import { useQueryState } from "nuqs"
 import { useCallback, useEffect } from "react"
 import { toast } from "sonner"
+import confetti from "canvas-confetti"
 import RecentSessions from "./_components/recent-sessions"
 import StudySettings from "./_components/study-settings"
 import StudyStats from "./_components/study-stats"
@@ -27,6 +28,36 @@ const triggerNotification = (title: string, body: string) => {
       tag: "study-notification",
     })
   }
+}
+
+const triggerConfettiSideCannons = () => {
+  const end = Date.now() + 3 * 1000 // 3 seconds
+  const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"]
+
+  const frame = () => {
+    if (Date.now() > end) return
+
+    confetti({
+      particleCount: 2,
+      angle: 60,
+      spread: 55,
+      startVelocity: 60,
+      origin: { x: 0, y: 0.5 },
+      colors: colors,
+    })
+    confetti({
+      particleCount: 2,
+      angle: 120,
+      spread: 55,
+      startVelocity: 60,
+      origin: { x: 1, y: 0.5 },
+      colors: colors,
+    })
+
+    requestAnimationFrame(frame)
+  }
+
+  frame()
 }
 
 export default function StudyPage() {
@@ -54,6 +85,7 @@ export default function StudyPage() {
   const updateSettings = useMutation(api.study.updateSettings)
   const completeSession = useMutation(api.study.completeSession)
   const stats = useQuery(api.study.getStats)
+  const userSettings = useQuery(api.study.getSettings)
 
 
   useEffect(() => {
@@ -61,6 +93,14 @@ export default function StudyPage() {
       Notification.requestPermission()
     }
   }, [])
+
+  // Sync user settings from Convex when loaded
+  useEffect(() => {
+    if (userSettings && userSettings.studyDuration && userSettings.dailyGoal) {
+      setStudyDuration(userSettings.studyDuration)
+      setDailyGoal(userSettings.dailyGoal)
+    }
+  }, [userSettings, setStudyDuration, setDailyGoal])
 
   const handleSessionComplete = useCallback(
     (time: number) => {
@@ -71,6 +111,9 @@ export default function StudyPage() {
         completed: true,
       })
 
+      // Trigger celebration effects
+      triggerConfettiSideCannons()
+      
       triggerNotification(
         "Study Session Complete! 🎉",
         `Great job! You studied for ${formatTimeTimer(time)}`,
