@@ -17,7 +17,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -96,6 +96,7 @@ export default function StudySessionDistribution({
   }[];
 }) {
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+  const [weekOffset, setWeekOffset] = React.useState(0); // 0 = current week, 1 = last week, etc.
 
   // Process data before any conditional returns
   const processedData = React.useMemo(() => {
@@ -110,15 +111,55 @@ export default function StudySessionDistribution({
   }, [recentSessions]);
 
   const data: ChartDataPoint[] = React.useMemo(() => {
-    return Object.entries(processedData)
+    const allData = Object.entries(processedData)
       .map(([date, counts]) => ({
         date,
         completed: counts.completed,
         incomplete: counts.incomplete,
       }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .slice(-7); // Show last 7 days
-  }, [processedData]);
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    // Calculate week ranges
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() - (weekOffset * 7));
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - 6);
+
+    // Filter data for the selected week
+    return allData.filter(item => {
+      const itemDate = new Date(item.date);
+      return itemDate >= startDate && itemDate <= endDate;
+    });
+  }, [processedData, weekOffset]);
+
+  // Calculate if there are previous/next weeks available
+  const { hasPreviousWeek, hasNextWeek } = React.useMemo(() => {
+    const allDates = Object.keys(processedData).map(date => new Date(date));
+    if (allDates.length === 0) return { hasPreviousWeek: false, hasNextWeek: false };
+    
+    const oldestDate = new Date(Math.min(...allDates.map(d => d.getTime())));
+    const currentWeekStart = new Date();
+    currentWeekStart.setDate(currentWeekStart.getDate() - ((weekOffset + 1) * 7) + 1);
+    
+    return {
+      hasPreviousWeek: oldestDate < currentWeekStart,
+      hasNextWeek: weekOffset > 0
+    };
+  }, [processedData, weekOffset]);
+
+  // Get current week period for display
+  const weekPeriod = React.useMemo(() => {
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() - (weekOffset * 7));
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - 6);
+    
+    return {
+      start: startDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      end: endDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      isCurrentWeek: weekOffset === 0
+    };
+  }, [weekOffset]);
 
   const activeData = React.useMemo(() => {
     if (activeIndex === null) return null;
@@ -168,15 +209,45 @@ export default function StudySessionDistribution({
     <Card className="overflow-hidden">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold">Daily Study Sessions</CardTitle>
-          <Badge
-            variant="outline"
-            className={`${getTrendColor()} border-none font-medium px-2.5 py-1`}
-          >
-            {getTrendIcon()}
-            <span className="ml-1">{completionRate.toFixed(1)}%</span>
-          </Badge>
+          <div className="flex items-center gap-3">
+            <CardTitle className="text-lg font-semibold">Daily Study Sessions</CardTitle>
+            <Badge
+              variant="outline"
+              className={`${getTrendColor()} border-none font-medium px-2.5 py-1`}
+            >
+              {getTrendIcon()}
+              <span className="ml-1">{completionRate.toFixed(1)}%</span>
+            </Badge>
+          </div>
+          
+          {/* Pagination Controls */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => setWeekOffset(prev => prev + 1)}
+              disabled={!hasPreviousWeek}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <div className="px-3 py-1 text-xs font-medium text-muted-foreground min-w-[100px] text-center">
+              {weekPeriod.isCurrentWeek ? "This Week" : `${weekPeriod.start} - ${weekPeriod.end}`}
+            </div>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => setWeekOffset(prev => prev - 1)}
+              disabled={!hasNextWeek}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
+        
         <CardDescription className="text-sm">
           {activeData ? (
             <div className="flex items-center gap-4 text-xs">
@@ -193,7 +264,12 @@ export default function StudySessionDistribution({
               </div>
             </div>
           ) : (
-            <span>Hover over bars to see daily breakdown • Last 7 days</span>
+            <div className="flex items-center justify-between">
+              <span>Hover over bars to see daily breakdown</span>
+              <span className="text-xs text-muted-foreground/70">
+                {data.length > 0 ? `${data.length} days with sessions` : "No sessions this week"}
+              </span>
+            </div>
           )}
         </CardDescription>
       </CardHeader>

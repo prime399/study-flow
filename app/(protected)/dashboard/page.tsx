@@ -6,10 +6,8 @@ import { api } from "@/convex/_generated/api"
 import { formatTime } from "@/lib/utils"
 import { useQuery } from "convex/react"
 import { BookOpen, Calendar, Clock, Target } from "lucide-react"
-import { StudentProgressChart } from "./_components/student-progress-chart"
 import StudyDurationChart from "./_components/study-duration-progress-chart"
 import StudySessionDistribution from "./_components/study-session-distribution-chart"
-import { StudySessionsChart } from "./_components/study-sessions-chart"
 import OnboardingDialogTrigger from "@/components/onboarding-dialog-trigger"
 import { Progress } from "@/components/ui/progress"
 
@@ -123,9 +121,6 @@ export default function DashboardPage() {
         <div className="grid gap-4 lg:grid-cols-2">
           <StudySessionDistribution recentSessions={stats.recentSessions} />
           <StudyDurationChart recentSessions={stats.recentSessions} />
-          {/* <StudySessionsChart recentSessions={stats.recentSessions} /> */}
-          {/* <CompletionRateChart /> */}
-          {/* <StudentProgressChart recentSessions={stats.recentSessions} /> */}
         </div>
       </div>
       <OnboardingDialogTrigger />
