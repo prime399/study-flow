@@ -20,6 +20,7 @@ import {
   Users,
   Zap,
 } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 const features = [
@@ -288,10 +289,12 @@ export default function Home() {
                     className="mx-2 sm:mx-4 w-72 sm:w-80 md:w-96 rounded-xl border border-white/20 bg-white/[0.08] backdrop-blur-md p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-white/30"
                   >
                     <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                      <img
+                      <Image
                         className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 border-white/20 shadow-md"
                         src={review.img}
                         alt={`${review.name} avatar`}
+                        width={48}
+                        height={48}
                       />
                       <div>
                         <div className="text-sm sm:text-base font-semibold text-white">
@@ -303,7 +306,7 @@ export default function Home() {
                       </div>
                     </div>
                     <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-                      "{review.body}"
+                      &ldquo;{review.body}&rdquo;
                     </p>
                   </div>
                 ))}
@@ -316,10 +319,12 @@ export default function Home() {
                     className="mx-2 sm:mx-4 w-72 sm:w-80 md:w-96 rounded-xl border border-white/20 bg-white/[0.08] backdrop-blur-md p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-white/30"
                   >
                     <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                      <img
+                      <Image
                         className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 border-white/20 shadow-md"
                         src={review.img}
                         alt={`${review.name} avatar`}
+                        width={48}
+                        height={48}
                       />
                       <div>
                         <div className="text-sm sm:text-base font-semibold text-white">
@@ -331,7 +336,7 @@ export default function Home() {
                       </div>
                     </div>
                     <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-                      "{review.body}"
+                      &ldquo;{review.body}&rdquo;
                     </p>
                   </div>
                 ))}

@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { api } from "@/convex/_generated/api"
 import { useMutation, useQuery } from "convex/react"
 import { useQueryState } from "nuqs"
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
 import { toast } from "sonner"
 import RecentSessions from "./_components/recent-sessions"
 import StudySettings from "./_components/study-settings"
@@ -13,6 +13,21 @@ import StudyStats from "./_components/study-stats"
 import StudyTimer from "./_components/study-timer"
 import NotificationPermission from "./_components/notification-permission"
 import { formatTimeTimer } from "@/lib/utils"
+
+const triggerNotification = (title: string, body: string) => {
+  if (
+    typeof window !== "undefined" &&
+    "Notification" in window &&
+    Notification.permission === "granted"
+  ) {
+    new Notification(title, {
+      body,
+      icon: "/favicon.ico",
+      badge: "/favicon.ico",
+      tag: "study-notification",
+    })
+  }
+}
 
 export default function StudyPage() {
   const [studyTime, setStudyTime] = useQueryState("studyTime", {
@@ -40,26 +55,29 @@ export default function StudyPage() {
   const completeSession = useMutation(api.study.completeSession)
   const stats = useQuery(api.study.getStats)
 
-  const showNotification = (title: string, body: string) => {
-    if (
-      typeof window !== "undefined" &&
-      "Notification" in window &&
-      Notification.permission === "granted"
-    ) {
-      new Notification(title, {
-        body,
-        icon: "/favicon.ico",
-        badge: "/favicon.ico",
-        tag: "study-notification",
-      })
-    }
-  }
 
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
       Notification.requestPermission()
     }
   }, [])
+
+  const handleSessionComplete = useCallback(
+    (time: number) => {
+      setIsStudying(false)
+      completeSession({
+        duration: time,
+        type: "study",
+        completed: true,
+      })
+
+      triggerNotification(
+        "Study Session Complete! 🎉",
+        `Great job! You studied for ${formatTimeTimer(time)}`,
+      )
+
+      toast.success("Great job! Take a break if you need one.")
+    }, [completeSession, setIsStudying])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -78,23 +96,7 @@ export default function StudyPage() {
     }
 
     return () => clearInterval(interval)
-  }, [isStudying, studyDuration])
-
-  const handleSessionComplete = (time: number) => {
-    setIsStudying(false)
-    completeSession({
-      duration: time,
-      type: "study",
-      completed: true,
-    })
-
-    showNotification(
-      "Study Session Complete! 🎉",
-      `Great job! You studied for ${formatTimeTimer(time)}`,
-    )
-
-    toast.success("Great job! Take a break if you need one.")
-  }
+  }, [handleSessionComplete, isStudying, setStudyTime, studyDuration])
 
   const handleDailyGoalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newGoal = Math.max(1, Number(e.target.value)) * 60
