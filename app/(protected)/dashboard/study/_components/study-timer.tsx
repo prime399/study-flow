@@ -2,6 +2,13 @@ import NumberFlow from "@number-flow/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { formatTimeTimer } from "@/lib/utils"
 import { Clock, Pause, Play, RotateCcw } from "lucide-react"
 import { useTopsStore } from "@/store/use-tops-store"
@@ -10,13 +17,19 @@ import { useEffect } from "react"
 export default function StudyTimer({
   studyTime,
   studyDuration,
+  studyType,
+  studyTypeOptions,
   isStudying,
+  onStudyTypeChange,
   onStartStop,
   onReset,
 }: {
   studyTime: number
   studyDuration: number
+  studyType: string
+  studyTypeOptions: { value: string; label: string }[]
   isStudying: boolean
+  onStudyTypeChange: (value: string) => void
   onStartStop: () => void
   onReset: () => void
 }) {
@@ -63,6 +76,23 @@ export default function StudyTimer({
           </div>
         </div>
         <Progress value={Math.min(progress, 100)} className="h-3" />
+        <div className="space-y-2 text-center">
+          <p className="text-sm font-medium text-muted-foreground">Study type</p>
+          <div className="flex justify-center">
+            <Select value={studyType} onValueChange={onStudyTypeChange}>
+              <SelectTrigger className="w-56 capitalize">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {studyTypeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value} className="capitalize">
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <div className="flex justify-center gap-4">
           <Button size="lg" onClick={onStartStop} className="w-32">
             {isStudying ? (

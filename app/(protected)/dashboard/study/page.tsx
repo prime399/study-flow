@@ -15,6 +15,13 @@ import StudyTimer from "./_components/study-timer"
 import NotificationPermission from "./_components/notification-permission"
 import { formatTimeTimer } from "@/lib/utils"
 
+const STUDY_TYPE_OPTIONS = [
+  { value: "study", label: "Study" },
+  { value: "review", label: "Review" },
+  { value: "practice", label: "Practice" },
+  { value: "reading", label: "Reading" },
+]
+
 const triggerNotification = (title: string, body: string) => {
   if (
     typeof window !== "undefined" &&
@@ -81,12 +88,27 @@ export default function StudyPage() {
     defaultValue: "stats",
     parse: (value) => value as "stats" | "settings" | "history",
   })
+  const [studyType, setStudyType] = useQueryState("studyType", {
+    defaultValue: "study",
+  })
 
   const updateSettings = useMutation(api.study.updateSettings)
   const completeSession = useMutation(api.study.completeSession)
   const stats = useQuery(api.study.getStats)
   const userSettings = useQuery(api.study.getSettings)
 
+  const selectedStudyType = (
+    STUDY_TYPE_OPTIONS.find((option) => option.value === studyType) ||
+    STUDY_TYPE_OPTIONS[0]
+  )
+  const studyTypeLabel = selectedStudyType.label
+
+  const handleStudyTypeChange = useCallback(
+    (value: string) => {
+      setStudyType(value)
+    },
+    [setStudyType],
+  )
 
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
@@ -107,7 +129,7 @@ export default function StudyPage() {
       setIsStudying(false)
       completeSession({
         duration: time,
-        type: "study",
+        type: studyType,
         completed: true,
       })
 
@@ -115,12 +137,12 @@ export default function StudyPage() {
       triggerConfettiSideCannons()
       
       triggerNotification(
-        "Study Session Complete! 🎉",
-        `Great job! You studied for ${formatTimeTimer(time)}`,
+        `${studyTypeLabel} Session Complete!`,
+        `Great job! You logged ${formatTimeTimer(time)}.`,
       )
 
-      toast.success("Great job! Take a break if you need one.")
-    }, [completeSession, setIsStudying])
+      toast.success(`Great job! ${studyTypeLabel} session complete.`)
+    }, [completeSession, setIsStudying, studyType, studyTypeLabel])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -151,12 +173,12 @@ export default function StudyPage() {
     if (isStudying) {
       completeSession({
         duration: studyTime,
-        type: "study",
+        type: studyType,
         completed: false,
       })
-      toast.success(`Study session paused at ${formatTimeTimer(studyTime)}.`)
+      toast.success(`${studyTypeLabel} session paused at ${formatTimeTimer(studyTime)}.`)
     } else {
-      toast.success("Study session started.")
+      toast.success(`${studyTypeLabel} session started.`)
     }
     setIsStudying(!isStudying)
   }
@@ -165,13 +187,13 @@ export default function StudyPage() {
     if (isStudying) {
       completeSession({
         duration: studyTime,
-        type: "study",
+        type: studyType,
         completed: false,
       })
     }
     setStudyTime(0)
     setIsStudying(false)
-    toast.success("Timer has been reset to 0.")
+    toast.success(`${studyTypeLabel} timer has been reset to 0.`)
   }
 
   const handleSaveSettings = async () => {
@@ -202,6 +224,9 @@ export default function StudyPage() {
         <StudyTimer
           studyTime={studyTime}
           studyDuration={studyDuration}
+          studyType={studyType}
+          studyTypeOptions={STUDY_TYPE_OPTIONS}
+          onStudyTypeChange={handleStudyTypeChange}
           isStudying={isStudying}
           onStartStop={handleStartStop}
           onReset={handleReset}

@@ -3,6 +3,13 @@ import { formatTimeTimer } from "@/lib/utils"
 import { History } from "lucide-react"
 
 export default function RecentSessions({ sessions }: { sessions: any[] }) {
+  const formatType = (type?: string) =>
+    type
+      ? type
+          .split(/[-_]/)
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(" ")
+      : "Study"
   return (
     <Card className="h-full">
       <CardHeader>
@@ -18,7 +25,7 @@ export default function RecentSessions({ sessions }: { sessions: any[] }) {
               className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-accent"
             >
               <div>
-                <p className="font-medium">Study Session</p>
+                <p className="font-medium">{formatType(session.type)} Session</p>
                 <p className="text-sm text-muted-foreground">
                   {new Date(session.startTime).toLocaleString()}
                 </p>
