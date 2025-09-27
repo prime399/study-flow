@@ -9,11 +9,14 @@ import {
   ListChecks,
   Trophy,
   Users,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { CommandMenu } from "./command-menu"
 import Logo from "./logo"
+import { Button } from "./ui/button"
 import {
   Sidebar,
   SidebarContent,
@@ -88,7 +91,7 @@ export default function MainSidebar() {
   const viewer = useQuery(api.users.viewer)
   const groups = useQuery(api.groups.listMyGroups)
   const pathname = usePathname()
-  const { state } = useSidebar()
+  const { state, toggleSidebar } = useSidebar()
 
   if (!viewer || !groups) {
     return (
@@ -98,9 +101,23 @@ export default function MainSidebar() {
         className="rounded-lg border bg-background"
       >
         <SidebarHeader className="w-full items-center bg-background">
-          <Link href="/" className="flex items-center gap-2 pb-2">
-            <Logo variant={state === "collapsed" ? "small" : "default"} />
-          </Link>
+          <div className="relative w-full">
+            <Link href="/" className="flex items-center gap-2 pb-2">
+              <Logo variant={state === "collapsed" ? "small" : "default"} />
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="absolute -right-3 top-0 z-20 h-6 w-6 rounded-full border bg-background shadow-md hover:bg-accent"
+            >
+              {state === "collapsed" ? (
+                <ChevronRight className="h-3 w-3" />
+              ) : (
+                <ChevronLeft className="h-3 w-3" />
+              )}
+            </Button>
+          </div>
         </SidebarHeader>
         <SidebarSeparator />
         <SidebarContent className="bg-background p-2">
@@ -139,9 +156,23 @@ export default function MainSidebar() {
       className="rounded-lg border bg-background"
     >
       <SidebarHeader className="w-full items-center bg-background">
-        <Link href="/" className="flex items-center gap-2 pb-2">
-          <Logo variant={state === "collapsed" ? "small" : "default"} />
-        </Link>
+        <div className="relative w-full">
+          <Link href="/" className="flex items-center gap-2 pb-2">
+            <Logo variant={state === "collapsed" ? "small" : "default"} />
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="absolute -right-3 top-0 z-20 h-6 w-6 rounded-full border bg-background shadow-md hover:bg-accent"
+          >
+            {state === "collapsed" ? (
+              <ChevronRight className="h-3 w-3" />
+            ) : (
+              <ChevronLeft className="h-3 w-3" />
+            )}
+          </Button>
+        </div>
         {state === "expanded" && <CommandMenu />}
       </SidebarHeader>
       <SidebarSeparator />

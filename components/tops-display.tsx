@@ -24,7 +24,7 @@ export function TopsDisplay() {
       </TooltipTrigger>
       <TooltipContent className="max-w-[250px]" side="right">
         <div className="space-y-2">
-          <p className="font-semibold">Tops - Study Currency</p>
+          <p className="font-semibold">Study - Mate Currency</p>
           <p className="text-sm text-muted-foreground">
             Earn 1 top for every second of focused study time.
             {currentSessionTops > 0 && (
