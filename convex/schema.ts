@@ -54,4 +54,26 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_total_time", ["totalStudyTime"]),
+  todos: defineTable({
+    userId: v.id("users"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    status: v.union(
+      v.literal("backlog"),
+      v.literal("in_progress"),
+      v.literal("review"),
+      v.literal("done"),
+    ),
+    priority: v.union(
+      v.literal("low"),
+      v.literal("medium"),
+      v.literal("high"),
+    ),
+    dueDate: v.optional(v.number()),
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_status", ["userId", "status"]),
 })

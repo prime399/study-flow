@@ -20,6 +20,7 @@ import type * as leaderboards from "../leaderboards.js";
 import type * as messages from "../messages.js";
 import type * as onboarding from "../onboarding.js";
 import type * as study from "../study.js";
+import type * as todos from "../todos.js";
 import type * as users from "../users.js";
 
 /**
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   messages: typeof messages;
   onboarding: typeof onboarding;
   study: typeof study;
+  todos: typeof todos;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

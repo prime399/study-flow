@@ -6,6 +6,7 @@ import {
   Bot,
   Calendar,
   LayoutDashboard,
+  ListChecks,
   Trophy,
   Users,
 } from "lucide-react"
@@ -42,6 +43,11 @@ const menuItems = [
     name: "Study",
     href: "/dashboard/study",
     icon: BookOpen,
+  },
+  {
+    name: "Tasks",
+    href: "/dashboard/todos",
+    icon: ListChecks,
   },
   {
     name: "Calendar",
