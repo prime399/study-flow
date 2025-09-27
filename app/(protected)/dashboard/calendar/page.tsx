@@ -41,25 +41,41 @@ export default function CalendarPage() {
     return <LoadingSkeleton />
   }
 
-  const events: CalendarEvent[] = stats.recentSessions.map((session) => ({
-    title: `${session.type} Session`,
-    start: new Date(session.startTime),
-    end: session.endTime
-      ? new Date(session.endTime)
-      : new Date(session.startTime),
-    allDay: false,
-    resource: session,
-  }))
+  const events: CalendarEvent[] = stats.recentSessions.map((session) => {
+    const startTime = new Date(session.startTime)
+    const endTime = session.endTime ? new Date(session.endTime) : new Date(session.startTime + 1000 * 60 * 30) // Default 30min if no end time
+    const timeString = format(startTime, 'HH:mm')
+    
+    return {
+      title: `${timeString} - ${session.type}`,
+      start: startTime,
+      end: endTime,
+      allDay: false,
+      resource: session,
+    }
+  })
 
   const eventStyleGetter = (event: CalendarEvent) => {
     const isCompleted = event.resource.completed
     return {
       className: cn(
-        "border rounded-md px-2 py-1",
+        "border rounded-md px-1 py-0.5 text-xs font-medium transition-colors overflow-hidden",
         isCompleted
-          ? "bg-green-100 border-green-200 text-green-800 dark:bg-green-900/30 dark:border-green-800 dark:text-green-300"
-          : "bg-red-100 border-red-200 text-red-800 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300",
+          ? "bg-green-100 border-green-200 text-green-800 dark:bg-green-900/30 dark:border-green-800 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50"
+          : "bg-red-100 border-red-200 text-red-800 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50",
       ),
+      style: {
+        border: 'none',
+        borderRadius: '4px',
+        fontSize: '11px',
+        lineHeight: '1.2',
+        height: 'auto',
+        maxHeight: '100%',
+        minHeight: '18px',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+      }
     }
   }
 
@@ -93,9 +109,23 @@ export default function CalendarPage() {
                 toolbar: CalendarToolbar,
                 header: CalendarHeader,
               }}
-              popup
+              popup={true}
+              popupOffset={5}
               selectable
-              className="calendar"
+              className="calendar bg-background text-foreground"
+              dayPropGetter={(date) => ({
+                className: "bg-background text-foreground hover:bg-accent/50 transition-colors",
+              })}
+              slotPropGetter={() => ({
+                className: "bg-background text-foreground border-border",
+              })}
+              step={30}
+              timeslots={2}
+              min={new Date(2024, 0, 1, 6, 0, 0)}
+              max={new Date(2024, 0, 1, 22, 0, 0)}
+              scrollToTime={new Date(2024, 0, 1, 8, 0, 0)}
+              showMultiDayTimes={true}
+              rtl={false}
             />
           </div>
           <ScrollBar orientation="horizontal" />
