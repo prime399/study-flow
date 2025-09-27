@@ -303,21 +303,21 @@ export function TodoBoard() {
   const isLoading = !boardResponse
 
   return (
-    <div className="space-y-8 sm:space-y-10">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight text-foreground">To-Do Board</h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">To-Do Board</h2>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground sm:text-base">
             Plan your study focus, drag tasks between columns, and keep your goals on track.
           </p>
         </div>
-        <Button onClick={() => openCreateDialog()} className="self-start rounded-full bg-primary/90 px-5 shadow-sm transition hover:bg-primary/80 hover:shadow-md">
+        <Button onClick={() => openCreateDialog()} className="self-start sm:self-auto rounded-full bg-primary/90 px-4 sm:px-5 py-2 shadow-sm transition hover:bg-primary/80 hover:shadow-md">
           <Plus className="mr-2 h-4 w-4" />
           New Task
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3 md:gap-6">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3 md:gap-6">
         <SummaryCard
           title="Total tasks"
           value={totals.all}
@@ -333,20 +333,20 @@ export function TodoBoard() {
         <SummaryCard title="Completed" value={totals.done} icon={CheckCircle2} tone="emerald" />
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-4 sm:space-y-6">
         <Kanban
           value={board}
           onValueChange={handleBoardChange}
           getItemValue={(item) => item._id}
           onMove={handleMove}
-          className="space-y-8"
+          className="space-y-4 sm:space-y-6"
         >
-          <KanbanBoard className="grid gap-6 md:grid-cols-2 xl:grid-cols-3 xl:gap-8">
+          <KanbanBoard className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 sm:gap-5 md:gap-6">
             {STATUS_CONFIG.map((column) => {
               const tasks = board[column.id]
               return (
                 <KanbanColumn key={column.id} value={column.id} disabled className="flex flex-col">
-                  <Card className={cn("group flex h-full flex-col overflow-hidden border border-border/60 bg-card/90 shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg", "dark:bg-card/70")}>
+                  <Card className={cn("group flex h-full flex-col overflow-hidden border border-border/60 bg-card shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg")}>
                     <CardHeader className={cn("space-y-3 border-b border-border/60 pb-4 text-foreground", "bg-gradient-to-br", column.headerClass)}>
                       <div className="flex items-center justify-between gap-2">
                         <div>
@@ -374,14 +374,14 @@ export function TodoBoard() {
                         </Button>
                       </div>
                     </CardHeader>
-                    <CardContent className="flex h-full flex-col gap-4 bg-muted/30 pt-4 dark:bg-muted/10">
-                      <KanbanColumnContent value={column.id} className="min-h-[500px] flex flex-1 flex-col gap-4 rounded-xl border border-dashed border-transparent bg-card/60 p-2 transition-colors duration-300 dark:bg-card/40">
+                    <CardContent className="flex h-full flex-col gap-3 sm:gap-4 bg-muted pt-3 sm:pt-4">
+                      <KanbanColumnContent value={column.id} className="min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] flex flex-1 flex-col gap-3 sm:gap-4 rounded-xl border border-dashed border-transparent bg-card p-2 transition-colors duration-300">
                         {isLoading && tasks.length === 0 ? (
-                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background/40 p-8 text-sm font-medium text-muted-foreground backdrop-blur-sm dark:bg-background/20">
+                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background p-4 sm:p-6 lg:p-8 text-sm font-medium text-muted-foreground">
                             Loading tasks...
                           </div>
                         ) : tasks.length === 0 ? (
-                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background/40 p-8 text-center text-sm font-medium text-muted-foreground backdrop-blur-sm dark:bg-background/20">
+                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background p-4 sm:p-6 lg:p-8 text-center text-sm font-medium text-muted-foreground">
                             {column.id === "backlog"
                               ? "Drop ideas here to work on later."
                               : "Nothing here yet. Move a task over when ready."}
@@ -481,15 +481,14 @@ function TaskCard({ task, onEdit, onDelete, isOverlay }: TaskCardProps) {
   return (
     <div
       className={cn(
-        "group rounded-xl border border-border/60 bg-card p-5 shadow-sm transition-all duration-300",
+        "group rounded-xl border border-border/60 bg-card p-3 sm:p-4 lg:p-5 shadow-sm transition-all duration-300",
         !isOverlay && "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-xl",
-        isOverlay && "border-primary/40 shadow-2xl rotate-3 scale-105 backdrop-blur",
-        "dark:bg-card/80"
+        isOverlay && "border-primary/40 shadow-2xl rotate-3 scale-105 backdrop-blur"
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 space-y-3">
-          <p className="line-clamp-2 text-lg font-semibold leading-tight text-foreground">{task.title}</p>
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
+        <div className="flex-1 space-y-2 sm:space-y-3">
+          <p className="line-clamp-2 text-base sm:text-lg font-semibold leading-tight text-foreground">{task.title}</p>
           {task.description && (
             <p className="line-clamp-3 text-sm text-muted-foreground leading-relaxed">{task.description}</p>
           )}
@@ -561,7 +560,7 @@ function TaskDialog({ open, onOpenChange, mode, state, onStateChange, onSubmit, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="mx-4 max-w-lg sm:mx-auto">
         <DialogHeader>
           <DialogTitle>{mode === "create" ? "Create new task" : "Edit task"}</DialogTitle>
           <DialogDescription>
@@ -593,7 +592,7 @@ function TaskDialog({ open, onOpenChange, mode, state, onStateChange, onSubmit, 
             />
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
             <div className="space-y-2">
               <Label>Status</Label>
               <Select value={state.status} onValueChange={(value: StatusId) => handleChange("status", value)}>
