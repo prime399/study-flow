@@ -203,26 +203,20 @@ export default function Home() {
             ))}
           </div>
           <div className="mx-auto max-w-5xl p-2 sm:p-4">
-            <div className="relative h-[300px] sm:h-[350px] lg:h-[400px] w-full rounded-[12px] bg-gradient-to-br from-blue-900/30 to-indigo-900/30 border border-white/10 shadow-xl overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center p-4">
-                <div className="text-center space-y-3 sm:space-y-4">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto bg-blue-600 rounded-lg flex items-center justify-center">
-                    <Timer className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-                  </div>
-                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    StudyMate Dashboard Preview
-                  </h3>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 max-w-md px-4">
-                    Your personalized study dashboard with analytics, goals, and progress tracking
-                  </p>
-                </div>
-              </div>
-              <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4">
-                <div className="grid grid-cols-3 gap-1 sm:gap-2">
-                  <div className="h-6 sm:h-8 bg-white/20 rounded"></div>
-                  <div className="h-6 sm:h-8 bg-white/20 rounded"></div>
-                  <div className="h-6 sm:h-8 bg-white/20 rounded"></div>
-                </div>
+            <div className="relative w-full rounded-[12px] border border-white/10 shadow-xl overflow-hidden bg-white/5 backdrop-blur-sm">
+              <div className="relative w-full">
+                <Image
+                  src="/main-dashboard.webp"
+                  alt="StudyMate Dashboard Preview"
+                  width={1200}
+                  height={800}
+                  className="w-full h-auto object-contain rounded-[12px]"
+                  priority
+                  style={{
+                    maxWidth: '100%',
+                    height: 'auto',
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -380,7 +374,7 @@ export default function Home() {
                 © 2024 StudyMate. All rights reserved.
               </p>
               <Link
-                href={"https://studymate.example.com"}
+                href={"https://www.study-mate.tech/#"}
                 className="text-sm text-gray-400 underline hover:text-white transition-colors"
                 target="_blank"
               >
