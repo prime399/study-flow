@@ -22,12 +22,23 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+
 const PREDEFINED_MESSAGES = [
   "How can I improve my study focus?",
   "What's the best study technique for me based on my stats?",
   "Give me tips for better time management",
   "How can I make my study sessions more effective?",
 ] as const
+
+const formatMessageContent = (content: string) => {
+  return content
+    .replace(/:\s+-/g, ':\n-')
+    .replace(/\u2022/g, '-')
+}
+
+
 
 interface Message {
   id: string
@@ -120,7 +131,10 @@ export default function AIHelperPage() {
       }
 
       const data = await response.json()
-      
+      const toolInvocations = Array.isArray(data.toolInvocations)
+        ? data.toolInvocations
+        : []
+
       let assistantContent = ""
       if (data.choices && data.choices[0] && data.choices[0].message) {
         assistantContent = data.choices[0].message.content
@@ -132,6 +146,8 @@ export default function AIHelperPage() {
         id: generateId(),
         role: "assistant",
         content: assistantContent,
+        toolInvocations:
+          toolInvocations.length > 0 ? toolInvocations : undefined,
         timestamp: Date.now(),
       }
 
@@ -281,7 +297,36 @@ export default function AIHelperPage() {
                         "max-w-prose rounded-lg bg-muted px-4 py-3",
                       )}
                     >
-                      {message.content}
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          p: ({ node, ...props }) => (
+                            <p className="leading-relaxed" {...props} />
+                          ),
+                          ul: ({ node, ...props }) => (
+                            <ul className="ml-4 list-disc space-y-1" {...props} />
+                          ),
+                          ol: ({ node, ...props }) => (
+                            <ol className="ml-4 list-decimal space-y-1" {...props} />
+                          ),
+                          li: ({ node, ...props }) => (
+                            <li className="leading-relaxed" {...props} />
+                          ),
+                          strong: ({ node, ...props }) => (
+                            <strong className="font-semibold" {...props} />
+                          ),
+                          a: ({ node, ...props }) => (
+                            <a
+                              className="underline decoration-muted-foreground/50 decoration-2 underline-offset-2 hover:text-primary"
+                              target="_blank"
+                              rel="noreferrer"
+                              {...props}
+                            />
+                          ),
+                        }}
+                      >
+                        {formatMessageContent(message.content)}
+                      </ReactMarkdown>
                     </div>
 
                     {message.role === "assistant" &&
@@ -399,3 +444,8 @@ export default function AIHelperPage() {
     </div>
   )
 }
+
+
+
+
+
