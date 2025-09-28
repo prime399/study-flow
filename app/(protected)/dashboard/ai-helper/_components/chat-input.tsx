@@ -34,46 +34,66 @@ export function ChatInput({
   }, [setInput])
 
   return (
-    <div className="border-t p-4">
-      <form onSubmit={onSubmit} className="flex items-center gap-2">
-        <Input
-          value={input}
-          onChange={handleInputChange}
-          placeholder="Ask anything about studying..."
-          disabled={isLoading || error != null}
-          className="flex-1"
-          autoFocus
-        />
-        <div className="flex gap-2">
-          {isLoading ? (
-            <Button
-              type="button"
-              variant="destructive"
-              size="icon"
-              onClick={onStop}
-            >
-              <StopCircle className="h-4 w-4" />
-            </Button>
-          ) : (
-            hasMessages && (
+    <div className="border-t">
+      <div className="p-4">
+        <form onSubmit={onSubmit} className="flex items-center gap-2">
+          <Input
+            value={input}
+            onChange={handleInputChange}
+            placeholder="Ask anything about studying..."
+            disabled={isLoading || error != null}
+            className="flex-1"
+            autoFocus
+          />
+          <div className="flex gap-2">
+            {isLoading ? (
               <Button
                 type="button"
-                variant="outline"
+                variant="destructive"
                 size="icon"
-                onClick={(e) => {
-                  e.preventDefault()
-                  onReload()
-                }}
+                onClick={onStop}
               >
-                <RefreshCw className="h-4 w-4" />
+                <StopCircle className="h-4 w-4" />
               </Button>
-            )
-          )}
-          <Button type="submit" size="icon" disabled={isLoading}>
-            <Send className="h-4 w-4" />
-          </Button>
+            ) : (
+              hasMessages && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    onReload()
+                  }}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              )
+            )}
+            <Button type="submit" size="icon" disabled={isLoading}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        </form>
+      </div>
+      
+      {/* Powered by footer */}
+      <div className="border-t bg-muted/30 px-4 py-2">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+              <span>AI Assistant Active</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span>Powered by</span>
+            <span className="font-semibold text-primary">Heroku Inference</span>
+            <span>•</span>
+            <span className="text-muted-foreground/70">Secure & Private</span>
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   )
 }
