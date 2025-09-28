@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { api } from "@/convex/_generated/api"
 import { cn } from "@/lib/utils"
-import { useChat } from "ai/react"
 import { useQuery } from "convex/react"
 import {
   Bot,
@@ -20,7 +19,7 @@ import {
   TrashIcon,
   User,
 } from "lucide-react"
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 
 const PREDEFINED_MESSAGES = [
@@ -30,60 +29,172 @@ const PREDEFINED_MESSAGES = [
   "How can I make my study sessions more effective?",
 ] as const
 
+interface Message {
+  id: string
+  role: "user" | "assistant"
+  content: string
+  toolInvocations?: any[]
+  timestamp: number
+}
+
 export default function AIHelperPage() {
   const getStudyStats = useQuery(api.study.getFullStats)
   const listMyGroups = useQuery(api.groups.listMyGroups)
   const user = useQuery(api.users.viewer)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
-    error,
-    reload,
-    stop,
-    append,
-    setMessages,
-  } = useChat({
-    api: "/api/ai-helper",
-    body: {
-      studyStats: getStudyStats,
-      groupInfo: listMyGroups,
-      userName: user?.name,
-    },
-    initialMessages:
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("chatMessages") || "[]")
-        : [],
-    onError: (error) => {
-      toast.error("An error occurred while getting a response: ", {
-        description: error.message,
-      })
-    },
-    onFinish: () => {
-      scrollToBottom()
-    },
-  })
+  // State management
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [abortController, setAbortController] = useState<AbortController | null>(null)
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
+  // Load messages from localStorage on mount
   useEffect(() => {
-    scrollToBottom()
+    if (typeof window !== "undefined") {
+      const savedMessages = localStorage.getItem("chatMessages")
+      if (savedMessages) {
+        try {
+          setMessages(JSON.parse(savedMessages))
+        } catch (e) {
+          console.error("Failed to parse saved messages:", e)
+        }
+      }
+    }
+  }, [])
+
+  // Save messages to localStorage
+  useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem("chatMessages", JSON.stringify(messages))
     }
   }, [messages])
 
-  const clearChat = () => {
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, scrollToBottom])
+
+  const generateId = () => Math.random().toString(36).substring(2, 15)
+
+  const sendMessage = useCallback(async (messageContent: string) => {
+    if (!messageContent.trim() || isLoading) return
+
+    const userMessage: Message = {
+      id: generateId(),
+      role: "user",
+      content: messageContent.trim(),
+      timestamp: Date.now(),
+    }
+
+    setMessages(prev => [...prev, userMessage])
+    setInput("")
+    setIsLoading(true)
+    setError(null)
+
+    // Create abort controller for this request
+    const controller = new AbortController()
+    setAbortController(controller)
+
+    try {
+      const response = await fetch("/api/ai-helper", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage],
+          studyStats: getStudyStats,
+          groupInfo: listMyGroups,
+          userName: user?.name,
+        }),
+        signal: controller.signal,
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      
+      let assistantContent = ""
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        assistantContent = data.choices[0].message.content
+      } else {
+        assistantContent = "I apologize, but I couldn't generate a proper response. Please try again."
+      }
+
+      const assistantMessage: Message = {
+        id: generateId(),
+        role: "assistant",
+        content: assistantContent,
+        timestamp: Date.now(),
+      }
+
+      setMessages(prev => [...prev, assistantMessage])
+
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        toast.info("Request cancelled")
+      } else {
+        console.error("Error sending message:", err)
+        setError(err.message)
+        toast.error("Failed to get response", {
+          description: err.message,
+        })
+      }
+    } finally {
+      setIsLoading(false)
+      setAbortController(null)
+    }
+  }, [isLoading, messages, getStudyStats, listMyGroups, user?.name])
+
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault()
+    sendMessage(input)
+  }, [input, sendMessage])
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value)
+  }, [])
+
+  const append = useCallback((message: { role: "user", content: string }) => {
+    sendMessage(message.content)
+  }, [sendMessage])
+
+  const stop = useCallback(() => {
+    if (abortController) {
+      abortController.abort()
+      setAbortController(null)
+      setIsLoading(false)
+      toast.info("Request stopped")
+    }
+  }, [abortController])
+
+  const reload = useCallback(() => {
+    if (messages.length > 0) {
+      const lastUserMessage = [...messages].reverse().find(m => m.role === "user")
+      if (lastUserMessage) {
+        // Remove the last assistant message if it exists
+        const lastMessageIndex = messages.length - 1
+        if (messages[lastMessageIndex]?.role === "assistant") {
+          setMessages(prev => prev.slice(0, -1))
+        }
+        sendMessage(lastUserMessage.content)
+      }
+    }
+  }, [messages, sendMessage])
+
+  const clearChat = useCallback(() => {
     setMessages([])
     localStorage.removeItem("chatMessages")
+    setError(null)
     toast.success("Chat history cleared")
-  }
+  }, [])
 
   return (
     <div className="">
@@ -132,7 +243,7 @@ export default function AIHelperPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {messages.map((message) => (
+              {messages.map((message: any) => (
                 <div
                   key={message.id}
                   className={cn(
@@ -174,7 +285,7 @@ export default function AIHelperPage() {
                     </div>
 
                     {message.role === "assistant" &&
-                      message.toolInvocations?.map((toolInvocation) => {
+                      message.toolInvocations?.map((toolInvocation: any) => {
                         const { toolName, toolCallId, state } = toolInvocation
 
                         if (state === "result") {
@@ -204,12 +315,29 @@ export default function AIHelperPage() {
                 </div>
               ))}
               {error && (
-                <>
-                  <div>An error occurred.</div>
-                  <button type="button" onClick={() => reload()}>
-                    Retry
-                  </button>
-                </>
+                <div className="flex gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-destructive/10">
+                    <Bot className="h-4 w-4 text-destructive" />
+                  </div>
+                  <div className="flex flex-col gap-2 rounded-lg bg-destructive/10 px-4 py-3">
+                    <div className="text-sm text-destructive">
+                      An error occurred: {error}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setError(null)
+                        reload()
+                      }}
+                      className="w-fit"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Retry
+                    </Button>
+                  </div>
+                </div>
               )}
               {isLoading && (
                 <div className="flex gap-3">
