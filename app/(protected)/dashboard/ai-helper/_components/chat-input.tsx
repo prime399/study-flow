@@ -1,3 +1,4 @@
+"use client"
 /**
  * Chat input component with send/stop/reload functionality
  * Handles user input and control actions for the chat interface

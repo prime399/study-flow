@@ -1,22 +1,40 @@
+"use client"
 /**
  * Model selection component for AI helper
  * Allows users to choose between different AI models
+ * Only shows models that are available (have API keys configured)
  */
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Brain, Cpu, Zap } from "lucide-react"
+import { Brain, Cpu, Zap, AlertTriangle } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export interface ModelInfo {
   id: string
   name: string
   description: string
-  icon: React.ReactNode
+  icon?: React.ReactNode
   badge?: string
   badgeVariant?: "default" | "secondary" | "destructive" | "outline"
 }
 
-export const AVAILABLE_MODELS: ModelInfo[] = [
+const getIconForModel = (id: string) => {
+  switch (id) {
+    case "gpt-oss-120b":
+    case "nova-pro":
+      return <Brain className="h-4 w-4" />
+    case "nova-lite":
+      return <Zap className="h-4 w-4" />
+    case "claude-3-5-haiku":
+      return <Cpu className="h-4 w-4" />
+    default:
+      return <Brain className="h-4 w-4" />
+  }
+}
+
+// Default models as fallback
+const DEFAULT_MODELS: ModelInfo[] = [
   {
     id: "gpt-oss-120b",
     name: "GPT OSS 120B",
@@ -58,18 +76,72 @@ interface ModelSelectorProps {
 }
 
 export function ModelSelector({ selectedModel, onModelChange, disabled = false }: ModelSelectorProps) {
-  const currentModel = AVAILABLE_MODELS.find(model => model.id === selectedModel) || AVAILABLE_MODELS[0]
+  const [availableModels, setAvailableModels] = useState<ModelInfo[]>(DEFAULT_MODELS)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch available models on component mount
+  useEffect(() => {
+    const fetchAvailableModels = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        
+        const response = await fetch('/api/ai-helper/models')
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch available models')
+        }
+        
+        const data = await response.json()
+        
+        if (data.models && data.models.length > 0) {
+          const withIcons = data.models.map((m: ModelInfo) => ({ ...m, icon: getIconForModel(m.id) }))
+          setAvailableModels(withIcons)
+          
+          // If current selected model is not available, switch to first available
+          if (!withIcons.some((model: ModelInfo) => model.id === selectedModel)) {
+            onModelChange(withIcons[0].id)
+          }
+        } else {
+          setError('No models available')
+        }
+      } catch (err) {
+        console.error('Error fetching models:', err)
+        setError('Failed to load models')
+        // Fallback to default models
+        setAvailableModels(DEFAULT_MODELS)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchAvailableModels()
+  }, [selectedModel, onModelChange])
+
+  const currentModel = availableModels.find(model => model.id === selectedModel) || availableModels[0]
+
+  if (error) {
+    return (
+      <div className="flex items-center gap-2 w-full sm:w-auto p-2 bg-destructive/10 text-destructive rounded-md border border-destructive/20">
+        <AlertTriangle className="h-4 w-4 shrink-0" />
+        <span className="text-xs">{error}</span>
+      </div>
+    )
+  }
 
   return (
     <div className="flex items-center gap-2 w-full sm:w-auto">
       <span className="text-sm text-muted-foreground hidden lg:inline">Model:</span>
-      <Select value={selectedModel} onValueChange={onModelChange} disabled={disabled}>
+      <Select value={selectedModel} onValueChange={onModelChange} disabled={disabled || isLoading}>
         <SelectTrigger className="w-full sm:w-[200px] lg:w-[220px] h-9 text-sm">
           <SelectValue>
             <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-              <span className="shrink-0">{currentModel.icon}</span>
-              <span className="truncate text-xs sm:text-sm">{currentModel.name}</span>
-              {currentModel.badge && (
+              <span className="shrink-0">{currentModel?.icon}</span>
+              <span className="truncate text-xs sm:text-sm">
+                {isLoading ? 'Loading...' : currentModel?.name}
+              </span>
+              {currentModel?.badge && !isLoading && (
                 <Badge variant={currentModel.badgeVariant} className="text-xs px-1 sm:px-1.5 py-0.5 shrink-0 hidden sm:inline-flex">
                   {currentModel.badge}
                 </Badge>
@@ -78,7 +150,7 @@ export function ModelSelector({ selectedModel, onModelChange, disabled = false }
           </SelectValue>
         </SelectTrigger>
         <SelectContent className="w-[280px] sm:w-[320px]">
-          {AVAILABLE_MODELS.map((model) => (
+          {availableModels.map((model) => (
             <SelectItem key={model.id} value={model.id} className="cursor-pointer">
               <div className="flex flex-col gap-1 py-1 w-full">
                 <div className="flex items-center gap-2">

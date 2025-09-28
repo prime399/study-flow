@@ -1,3 +1,4 @@
+"use client"
 /**
  * Predefined message suggestions for users
  * Provides quick-start options for common queries

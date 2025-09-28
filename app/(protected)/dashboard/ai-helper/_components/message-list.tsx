@@ -1,3 +1,4 @@
+"use client"
 /**
  * Message list component for displaying chat messages
  * Handles rendering of user and assistant messages with proper styling

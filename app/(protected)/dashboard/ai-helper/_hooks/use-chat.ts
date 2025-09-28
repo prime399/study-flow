@@ -39,10 +39,27 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
       setMessages(savedMessages)
     }
     
-    // Load saved model preference
+    // Load saved model preference and validate it's available
     const savedModel = localStorage.getItem("preferredModel")
-    if (savedModel && ["gpt-oss-120b", "nova-lite", "nova-pro", "claude-3-5-haiku"].includes(savedModel)) {
-      setSelectedModel(savedModel)
+    if (savedModel) {
+      // Validate model availability by checking with backend
+      fetch('/api/ai-helper/models')
+        .then(res => res.json())
+        .then(data => {
+          if (data.models?.some((model: any) => model.id === savedModel)) {
+            setSelectedModel(savedModel)
+          } else {
+            // Model not available, use first available model
+            if (data.models?.length > 0) {
+              setSelectedModel(data.models[0].id)
+              localStorage.setItem("preferredModel", data.models[0].id)
+            }
+          }
+        })
+        .catch(err => {
+          console.warn("Failed to validate model availability:", err)
+          // Keep default model on error
+        })
     }
   }, [])
 
