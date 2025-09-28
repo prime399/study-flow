@@ -30,14 +30,26 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [abortController, setAbortController] = useState<AbortController | null>(null)
+  const [selectedModel, setSelectedModel] = useState("gpt-oss-120b") // Default to original OpenAI OSS model
 
-  // Load messages from localStorage on mount
+  // Load messages and model preference from localStorage on mount
   useEffect(() => {
     const savedMessages = loadMessagesFromStorage()
     if (savedMessages.length > 0) {
       setMessages(savedMessages)
     }
+    
+    // Load saved model preference
+    const savedModel = localStorage.getItem("preferredModel")
+    if (savedModel && ["gpt-oss-120b", "nova-lite", "nova-pro", "claude-3-5-haiku"].includes(savedModel)) {
+      setSelectedModel(savedModel)
+    }
   }, [])
+
+  // Save model preference to localStorage
+  useEffect(() => {
+    localStorage.setItem("preferredModel", selectedModel)
+  }, [selectedModel])
 
   // Save messages to localStorage
   useEffect(() => {
@@ -76,6 +88,7 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
           studyStats,
           groupInfo,
           userName,
+          modelId: selectedModel,
         }),
         signal: controller.signal,
       })
@@ -113,7 +126,7 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
       setIsLoading(false)
       setAbortController(null)
     }
-  }, [isLoading, messages, studyStats, groupInfo, userName])
+  }, [isLoading, messages, studyStats, groupInfo, userName, selectedModel])
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
@@ -165,6 +178,8 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
     isLoading,
     error,
     messagesEndRef,
+    selectedModel,
+    setSelectedModel,
     handleSubmit,
     append,
     stop,

@@ -17,6 +17,7 @@ interface ChatInputProps {
   isLoading: boolean
   error: string | null
   hasMessages: boolean
+  selectedModel: string
 }
 
 export function ChatInput({
@@ -27,7 +28,8 @@ export function ChatInput({
   onReload,
   isLoading,
   error,
-  hasMessages
+  hasMessages,
+  selectedModel
 }: ChatInputProps) {
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value)
@@ -89,6 +91,8 @@ export function ChatInput({
           <div className="flex items-center gap-2">
             <span>Powered by</span>
             <span className="font-semibold text-primary">Heroku Inference</span>
+            <span>•</span>
+            <span className="text-muted-foreground/70">{selectedModel}</span>
             <span>•</span>
             <span className="text-muted-foreground/70">Secure & Private</span>
           </div>

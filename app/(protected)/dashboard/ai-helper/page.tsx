@@ -12,6 +12,7 @@ import { useChat } from "./_hooks/use-chat"
 import { PredefinedMessages } from "./_components/predefined-messages"
 import { MessageList } from "./_components/message-list"
 import { ChatInput } from "./_components/chat-input"
+import { ModelSelector } from "./_components/model-selector"
 
 export default function AIHelperPage() {
   const getStudyStats = useQuery(api.study.getFullStats)
@@ -25,6 +26,8 @@ export default function AIHelperPage() {
     isLoading,
     error,
     messagesEndRef,
+    selectedModel,
+    setSelectedModel,
     handleSubmit,
     append,
     stop,
@@ -41,15 +44,22 @@ export default function AIHelperPage() {
     <div className="">
       <div className="flex items-center justify-between">
         <PageTitle title="AI Study Assistant" />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={clearChat}
-          className="gap-2"
-        >
-          <TrashIcon className="h-4 w-4" />
-          Clear Chat
-        </Button>
+        <div className="flex items-center gap-3">
+          <ModelSelector
+            selectedModel={selectedModel}
+            onModelChange={setSelectedModel}
+            disabled={isLoading}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={clearChat}
+            className="gap-2"
+          >
+            <TrashIcon className="h-4 w-4" />
+            Clear Chat
+          </Button>
+        </div>
       </div>
       <Card className="flex h-[calc(100svh-120px)] flex-col">
         <ScrollArea
@@ -84,6 +94,7 @@ export default function AIHelperPage() {
           isLoading={isLoading}
           error={error}
           hasMessages={messages.length > 0}
+          selectedModel={selectedModel}
         />
       </Card>
     </div>

@@ -13,11 +13,11 @@ import { processAIResponse } from "./_lib/response-processor"
 
 export async function POST(req: Request) {
   try {
-    const { messages, userName, studyStats, groupInfo }: AIRequestBody =
+    const { messages, userName, studyStats, groupInfo, modelId }: AIRequestBody & { modelId?: string } =
       await req.json()
 
     // Validate and get OpenAI configuration
-    const config = validateOpenAIConfig()
+    const config = validateOpenAIConfig(modelId)
     
     // Build system prompt with user context
     const systemPrompt = buildSystemPrompt({ userName, studyStats, groupInfo })

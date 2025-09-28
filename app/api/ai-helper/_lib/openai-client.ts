@@ -11,10 +11,12 @@ export interface OpenAIConfig {
   herokuModelId: string
 }
 
-export function validateOpenAIConfig(): OpenAIConfig {
+export function validateOpenAIConfig(modelId?: string): OpenAIConfig {
   const herokuBaseUrl = process.env.HEROKU_INFERENCE_URL
   const herokuApiKey = process.env.HEROKU_INFERENCE_KEY
-  const herokuModelId = process.env.HEROKU_INFERENCE_MODEL_ID ?? "gpt-oss-120b"
+  
+  // Use provided modelId or fall back to environment variable or default
+  const herokuModelId = modelId || process.env.HEROKU_INFERENCE_MODEL_ID || "gpt-oss-120b"
 
   if (!herokuBaseUrl || !herokuApiKey) {
     throw new Error("Heroku Inference API is not configured.")
