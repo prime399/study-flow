@@ -128,3 +128,89 @@ to {
   transform: translateY(calc(-100% - var(--gap)));
   }
 }
+
+
+.markdown-body {
+  @apply space-y-3 text-sm leading-relaxed;
+}
+
+.markdown-body p {
+  @apply whitespace-pre-wrap;
+}
+
+.markdown-body ul {
+  @apply list-disc space-y-1.5 pl-5;
+}
+
+.markdown-body ol {
+  @apply list-decimal space-y-1.5 pl-5;
+}
+
+.markdown-body pre {
+  @apply overflow-x-auto rounded-lg bg-muted/70 p-4 text-sm;
+}
+
+.markdown-body pre code {
+  @apply bg-transparent p-0;
+}
+
+.markdown-body code {
+  @apply font-mono text-xs;
+}
+
+.markdown-body code:not(pre code) {
+  @apply rounded bg-muted px-1.5 py-0.5;
+}
+
+.markdown-body table {
+  @apply my-3 w-full border-collapse text-sm;
+}
+
+.markdown-body thead {
+  @apply bg-muted;
+}
+
+.markdown-body th,
+.markdown-body td {
+  @apply border border-border px-3 py-2 align-top;
+}
+
+.markdown-body .hljs,
+.markdown-body .hljs-subst {
+  @apply bg-transparent text-inherit;
+}
+
+.markdown-body .hljs-keyword,
+.markdown-body .hljs-selector-tag,
+.markdown-body .hljs-literal,
+.markdown-body .hljs-name {
+  @apply text-blue-500;
+}
+
+.markdown-body .hljs-string,
+.markdown-body .hljs-title,
+.markdown-body .hljs-attr,
+.markdown-body .hljs-attribute {
+  @apply text-emerald-500;
+}
+
+.markdown-body .hljs-number,
+.markdown-body .hljs-symbol,
+.markdown-body .hljs-bullet {
+  @apply text-purple-500;
+}
+
+.markdown-body .hljs-comment,
+.markdown-body .hljs-quote {
+  @apply text-muted-foreground;
+}
+
+.markdown-table-wrapper {
+  @apply overflow-hidden rounded-lg border border-border;
+}
+
+
+.markdown-pre {
+  @apply overflow-x-auto rounded-lg bg-muted/70 p-4 text-sm;
+}
+
