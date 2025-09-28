@@ -41,10 +41,11 @@ export default function AIHelperPage() {
   })
 
   return (
-    <div className="">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-screen max-h-screen overflow-hidden">
+      {/* Header section - responsive layout */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-4 pb-2 sm:pb-4 shrink-0 border-b">
         <PageTitle title="AI Study Assistant" />
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <ModelSelector
             selectedModel={selectedModel}
             onModelChange={setSelectedModel}
@@ -54,49 +55,52 @@ export default function AIHelperPage() {
             variant="outline"
             size="sm"
             onClick={clearChat}
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto"
           >
             <TrashIcon className="h-4 w-4" />
-            Clear Chat
+            <span className="sm:inline">Clear Chat</span>
           </Button>
         </div>
       </div>
-      <Card className="flex h-[calc(100svh-120px)] flex-col">
-        <ScrollArea
-          className="flex-1 p-4"
-          style={{ height: "calc(100% - 80px)" }}
-        >
-          {messages.length === 0 ? (
-            <PredefinedMessages 
-              onMessageSelect={(message) => append({ role: "user", content: message })}
-              isLoading={isLoading}
-            />
-          ) : (
-            <>
-              <MessageList
-                messages={messages}
-                user={user}
-                error={error}
+      
+      {/* Chat container - full height minus header */}
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <ScrollArea className="h-full p-2 sm:p-4">
+            {messages.length === 0 ? (
+              <PredefinedMessages 
+                onMessageSelect={(message) => append({ role: "user", content: message })}
                 isLoading={isLoading}
-                onRetry={reload}
-                onClearError={clearError}
               />
-              <div ref={messagesEndRef} />
-            </>
-          )}
-        </ScrollArea>
-        <ChatInput
-          input={input}
-          setInput={setInput}
-          onSubmit={handleSubmit}
-          onStop={stop}
-          onReload={reload}
-          isLoading={isLoading}
-          error={error}
-          hasMessages={messages.length > 0}
-          selectedModel={selectedModel}
-        />
-      </Card>
+            ) : (
+              <>
+                <MessageList
+                  messages={messages}
+                  user={user}
+                  error={error}
+                  isLoading={isLoading}
+                  onRetry={reload}
+                  onClearError={clearError}
+                />
+                <div ref={messagesEndRef} />
+              </>
+            )}
+          </ScrollArea>
+        </div>
+        <div className="shrink-0 border-t bg-background">
+          <ChatInput
+            input={input}
+            setInput={setInput}
+            onSubmit={handleSubmit}
+            onStop={stop}
+            onReload={reload}
+            isLoading={isLoading}
+            error={error}
+            hasMessages={messages.length > 0}
+            selectedModel={selectedModel}
+          />
+        </div>
+      </div>
     </div>
   )
 }

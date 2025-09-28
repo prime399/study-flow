@@ -84,30 +84,30 @@ const MESSAGE_CATEGORIES = [
 
 export function PredefinedMessages({ onMessageSelect, isLoading }: PredefinedMessagesProps) {
   return (
-    <div className="flex h-full flex-col items-center justify-start py-6 text-center">
-      <div className="mb-6">
-        <Bot className="mx-auto mb-3 h-12 w-12 text-primary" />
-        <h3 className="mb-2 text-xl font-semibold text-foreground">
+    <div className="flex h-full flex-col items-center justify-start py-3 sm:py-6 text-center px-2 sm:px-4 overflow-y-auto">
+      <div className="mb-4 sm:mb-6">
+        <Bot className="mx-auto mb-2 sm:mb-3 h-10 w-10 sm:h-12 sm:w-12 text-primary" />
+        <h3 className="mb-2 text-lg sm:text-xl font-semibold text-foreground">
           How can I help you study better?
         </h3>
-        <p className="max-w-md text-sm text-muted-foreground">
+        <p className="max-w-sm sm:max-w-md text-xs sm:text-sm text-muted-foreground px-2 sm:px-0">
           Choose from popular questions below or ask me anything about study techniques, 
           time management, and personalized advice based on your study patterns.
         </p>
       </div>
       
-      <div className="w-full max-w-4xl space-y-6 overflow-y-auto">
+      <div className="w-full max-w-4xl space-y-4 sm:space-y-6">
         {MESSAGE_CATEGORIES.map((category) => (
-          <div key={category.title} className="space-y-3">
-            <h4 className="text-sm font-medium text-muted-foreground text-left">
+          <div key={category.title} className="space-y-2 sm:space-y-3">
+            <h4 className="text-xs sm:text-sm font-medium text-muted-foreground text-left px-1">
               {category.title}
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
               {category.messages.map((message) => (
                 <Button
                   key={message}
                   variant="outline"
-                  className={`h-auto whitespace-normal text-left text-sm p-3 transition-colors ${category.color}`}
+                  className={`h-auto whitespace-normal text-left text-xs sm:text-sm p-2 sm:p-3 transition-colors ${category.color} leading-relaxed min-h-[2.5rem]`}
                   onClick={() => onMessageSelect(message)}
                   disabled={isLoading}
                 >
@@ -119,14 +119,16 @@ export function PredefinedMessages({ onMessageSelect, isLoading }: PredefinedMes
         ))}
       </div>
       
-      <div className="mt-6 space-y-2 text-center">
-        <div className="text-xs text-muted-foreground">
+      <div className="mt-4 sm:mt-6 space-y-2 text-center">
+        <div className="text-xs text-muted-foreground px-2">
           💡 Tip: The more specific your question, the better I can help!
         </div>
-        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
-          <span>Powered by</span>
-          <span className="font-semibold text-primary">Heroku Inference</span>
-          <span>•</span>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs text-muted-foreground/70 px-2">
+          <div className="flex items-center gap-1">
+            <span>Powered by</span>
+            <span className="font-semibold text-primary">Heroku Inference</span>
+          </div>
+          <span className="hidden sm:inline">•</span>
           <span>AI Study Assistant</span>
         </div>
       </div>

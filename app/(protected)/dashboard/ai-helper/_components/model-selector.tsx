@@ -61,29 +61,29 @@ export function ModelSelector({ selectedModel, onModelChange, disabled = false }
   const currentModel = AVAILABLE_MODELS.find(model => model.id === selectedModel) || AVAILABLE_MODELS[0]
 
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground hidden sm:inline">Model:</span>
+    <div className="flex items-center gap-2 w-full sm:w-auto">
+      <span className="text-sm text-muted-foreground hidden lg:inline">Model:</span>
       <Select value={selectedModel} onValueChange={onModelChange} disabled={disabled}>
-        <SelectTrigger className="w-[220px] h-9 text-sm">
+        <SelectTrigger className="w-full sm:w-[200px] lg:w-[220px] h-9 text-sm">
           <SelectValue>
-            <div className="flex items-center gap-2 min-w-0">
-              {currentModel.icon}
-              <span className="truncate">{currentModel.name}</span>
+            <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+              <span className="shrink-0">{currentModel.icon}</span>
+              <span className="truncate text-xs sm:text-sm">{currentModel.name}</span>
               {currentModel.badge && (
-                <Badge variant={currentModel.badgeVariant} className="text-xs px-1.5 py-0.5 shrink-0">
+                <Badge variant={currentModel.badgeVariant} className="text-xs px-1 sm:px-1.5 py-0.5 shrink-0 hidden sm:inline-flex">
                   {currentModel.badge}
                 </Badge>
               )}
             </div>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="w-[320px]">
+        <SelectContent className="w-[280px] sm:w-[320px]">
           {AVAILABLE_MODELS.map((model) => (
             <SelectItem key={model.id} value={model.id} className="cursor-pointer">
               <div className="flex flex-col gap-1 py-1 w-full">
                 <div className="flex items-center gap-2">
                   {model.icon}
-                  <span className="font-medium">{model.name}</span>
+                  <span className="font-medium text-sm">{model.name}</span>
                   {model.badge && (
                     <Badge variant={model.badgeVariant} className="text-xs px-1.5 py-0.5">
                       {model.badge}

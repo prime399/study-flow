@@ -34,46 +34,46 @@ export function MessageList({
   onClearError 
 }: MessageListProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {messages.map((message) => (
         <div
           key={message.id}
           className={cn(
-            "flex gap-3 text-sm",
+            "flex gap-2 sm:gap-3 text-sm",
             message.role === "user" ? "flex-row-reverse" : "flex-row",
           )}
         >
           <div
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-full",
+              "flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full shrink-0",
               message.role === "user"
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted",
             )}
           >
             {message.role === "user" ? (
-              <Avatar className="size-8">
+              <Avatar className="size-7 sm:size-8">
                 <AvatarImage src={user?.image} />
                 <AvatarFallback>
-                  <User />
+                  <User className="h-3 w-3 sm:h-4 sm:w-4" />
                 </AvatarFallback>
               </Avatar>
             ) : (
-              <Bot className="size-6" />
+              <Bot className="h-4 w-4 sm:h-5 sm:w-5" />
             )}
           </div>
           <div
             className={cn(
-              "flex flex-col gap-4",
+              "flex flex-col gap-2 sm:gap-4 min-w-0 flex-1",
               message.role === "user" ? "items-end" : "items-start",
             )}
           >
             <div
               className={cn(
-                "w-full max-w-prose rounded-lg bg-muted px-4 py-3",
+                "w-full max-w-[calc(100vw-4rem)] sm:max-w-prose rounded-lg bg-muted px-3 sm:px-4 py-2 sm:py-3 overflow-hidden break-words",
               )}
             >
-              <div className="markdown-body">
+              <div className="markdown-body text-xs sm:text-sm overflow-wrap-anywhere">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeHighlight]}
@@ -116,12 +116,12 @@ export function MessageList({
       ))}
       
       {error && (
-        <div className="flex gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-destructive/10">
-            <Bot className="h-4 w-4 text-destructive" />
+        <div className="flex gap-2 sm:gap-3">
+          <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-destructive/10 shrink-0">
+            <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-destructive" />
           </div>
-          <div className="flex flex-col gap-2 rounded-lg bg-destructive/10 px-4 py-3">
-            <div className="text-sm text-destructive">
+          <div className="flex flex-col gap-2 rounded-lg bg-destructive/10 px-3 sm:px-4 py-2 sm:py-3 min-w-0 flex-1">
+            <div className="text-xs sm:text-sm text-destructive break-words">
               An error occurred: {error}
             </div>
             <Button
@@ -132,9 +132,9 @@ export function MessageList({
                 onClearError()
                 onRetry()
               }}
-              className="w-fit"
+              className="w-fit text-xs sm:text-sm"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               Retry
             </Button>
           </div>
@@ -142,13 +142,13 @@ export function MessageList({
       )}
       
       {isLoading && (
-        <div className="flex gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-            <Bot className="h-4 w-4" />
+        <div className="flex gap-2 sm:gap-3">
+          <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-muted shrink-0">
+            <Bot className="h-3 w-3 sm:h-4 sm:w-4" />
           </div>
-          <div className="flex items-center gap-2 rounded-lg bg-muted px-4 py-3">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Thinking...
+          <div className="flex items-center gap-2 rounded-lg bg-muted px-3 sm:px-4 py-2 sm:py-3">
+            <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+            <span className="text-xs sm:text-sm">Thinking...</span>
           </div>
         </div>
       )}

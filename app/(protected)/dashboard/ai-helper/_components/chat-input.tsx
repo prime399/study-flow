@@ -36,24 +36,25 @@ export function ChatInput({
   }, [setInput])
 
   return (
-    <div className="border-t">
-      <div className="p-4">
+    <div className="">
+      <div className="p-2 sm:p-4">
         <form onSubmit={onSubmit} className="flex items-center gap-2">
           <Input
             value={input}
             onChange={handleInputChange}
             placeholder="Ask anything about studying..."
             disabled={isLoading || error != null}
-            className="flex-1"
+            className="flex-1 text-sm sm:text-base"
             autoFocus
           />
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2 shrink-0">
             {isLoading ? (
               <Button
                 type="button"
                 variant="destructive"
                 size="icon"
                 onClick={onStop}
+                className="h-9 w-9 sm:h-10 sm:w-10"
               >
                 <StopCircle className="h-4 w-4" />
               </Button>
@@ -67,34 +68,38 @@ export function ChatInput({
                     e.preventDefault()
                     onReload()
                   }}
+                  className="h-9 w-9 sm:h-10 sm:w-10"
                 >
                   <RefreshCw className="h-4 w-4" />
                 </Button>
               )
             )}
-            <Button type="submit" size="icon" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              size="icon" 
+              disabled={isLoading || !input.trim()}
+              className="h-9 w-9 sm:h-10 sm:w-10"
+            >
               <Send className="h-4 w-4" />
             </Button>
           </div>
         </form>
       </div>
       
-      {/* Powered by footer */}
-      <div className="border-t bg-muted/30 px-4 py-2">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+      {/* Powered by footer - responsive */}
+      <div className="border-t bg-muted/30 px-2 sm:px-4 py-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
               <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
               <span>AI Assistant Active</span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span>Powered by</span>
-            <span className="font-semibold text-primary">Heroku Inference</span>
-            <span>•</span>
-            <span className="text-muted-foreground/70">{selectedModel}</span>
-            <span>•</span>
-            <span className="text-muted-foreground/70">Secure & Private</span>
+          <div className="flex items-center gap-1 sm:gap-2 text-xs overflow-hidden">
+            <span className="hidden sm:inline">Powered by</span>
+            <span className="font-semibold text-primary truncate">{selectedModel}</span>
+            <span className="hidden sm:inline">•</span>
+            <span className="text-muted-foreground/70 hidden lg:inline">Secure & Private</span>
           </div>
         </div>
       </div>

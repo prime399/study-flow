@@ -11,16 +11,16 @@ type CodeProps = ComponentPropsWithoutRef<'code'> & { inline?: boolean; children
 
 export const markdownComponents: Components = {
   p: ({ node, ...props }) => (
-    <p className="whitespace-pre-wrap leading-relaxed" {...props} />
+    <p className="whitespace-pre-wrap leading-relaxed text-xs sm:text-sm" {...props} />
   ),
   ul: ({ node, ...props }) => (
-    <ul className="ml-5 list-disc space-y-1.5" {...props} />
+    <ul className="ml-3 sm:ml-5 list-disc space-y-1 sm:space-y-1.5 text-xs sm:text-sm" {...props} />
   ),
   ol: ({ node, ...props }) => (
-    <ol className="ml-5 list-decimal space-y-1.5" {...props} />
+    <ol className="ml-3 sm:ml-5 list-decimal space-y-1 sm:space-y-1.5 text-xs sm:text-sm" {...props} />
   ),
   li: ({ node, ...props }) => (
-    <li className="leading-relaxed" {...props} />
+    <li className="leading-relaxed text-xs sm:text-sm" {...props} />
   ),
   strong: ({ node, ...props }) => (
     <strong className="font-semibold" {...props} />
@@ -67,9 +67,9 @@ export const markdownComponents: Components = {
     )
   },
   table: ({ node, className, ...props }) => (
-    <div className="markdown-table-wrapper">
+    <div className="markdown-table-wrapper overflow-x-auto -mx-1 sm:mx-0">
       <table
-        className={cn("w-full border-collapse text-sm", className)}
+        className={cn("w-full border-collapse text-xs sm:text-sm min-w-full", className)}
         {...props}
       />
     </div>
@@ -83,13 +83,13 @@ export const markdownComponents: Components = {
   th: ({ node, className, ...props }) => (
     <th
       className={cn(
-        "border-b border-border px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+        "border-b border-border px-2 sm:px-3 py-1 sm:py-2 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap",
         className,
       )}
       {...props}
     />
   ),
   td: ({ node, className, ...props }) => (
-    <td className={cn("px-3 py-2 align-top text-sm", className)} {...props} />
+    <td className={cn("px-2 sm:px-3 py-1 sm:py-2 align-top text-xs sm:text-sm break-words", className)} {...props} />
   ),
 }
