@@ -5,7 +5,8 @@
  */
 
 import { Button } from "@/components/ui/button"
-import { Bot } from "lucide-react"
+import { Bot, ChevronDown, ChevronUp } from "lucide-react"
+import { useState } from "react"
 
 export const PREDEFINED_MESSAGES = [
   // Focus & Concentration
@@ -84,31 +85,44 @@ const MESSAGE_CATEGORIES = [
 ] as const
 
 export function PredefinedMessages({ onMessageSelect, isLoading }: PredefinedMessagesProps) {
+  const [showMore, setShowMore] = useState(false)
+  
+  // Primary categories to show by default
+  const primaryCategories = MESSAGE_CATEGORIES.filter(cat => 
+    cat.title.includes("Study Techniques") || cat.title.includes("Time Management")
+  )
+  
+  // Additional categories to show in "View More"
+  const additionalCategories = MESSAGE_CATEGORIES.filter(cat => 
+    !cat.title.includes("Study Techniques") && !cat.title.includes("Time Management")
+  )
+
   return (
-    <div className="flex h-full flex-col items-center justify-start py-3 sm:py-6 text-center px-2 sm:px-4 overflow-y-auto">
-      <div className="mb-4 sm:mb-6">
-        <Bot className="mx-auto mb-2 sm:mb-3 h-10 w-10 sm:h-12 sm:w-12 text-primary" />
-        <h3 className="mb-2 text-lg sm:text-xl font-semibold text-foreground">
-          How can I help you study better?
+    <div className="flex h-full flex-col items-center justify-start py-4 sm:py-8 text-center px-3 sm:px-6 overflow-y-auto">
+      <div className="mb-6 sm:mb-8">
+        <Bot className="mx-auto mb-3 sm:mb-4 h-12 w-12 sm:h-16 sm:w-16 text-primary" />
+        <h3 className="mb-3 text-xl sm:text-2xl font-bold text-foreground">
+          AI Study Assistant
         </h3>
-        <p className="max-w-sm sm:max-w-md text-xs sm:text-sm text-muted-foreground px-2 sm:px-0">
-          Choose from popular questions below or ask me anything about study techniques, 
-          time management, and personalized advice based on your study patterns.
+        <p className="max-w-lg text-sm sm:text-base text-muted-foreground leading-relaxed">
+          Get personalized study advice, techniques, and insights based on your learning patterns. 
+          Choose a topic below or ask me anything!
         </p>
       </div>
       
-      <div className="w-full max-w-4xl space-y-4 sm:space-y-6">
-        {MESSAGE_CATEGORIES.map((category) => (
-          <div key={category.title} className="space-y-2 sm:space-y-3">
-            <h4 className="text-xs sm:text-sm font-medium text-muted-foreground text-left px-1">
+      <div className="w-full max-w-5xl space-y-6 sm:space-y-8">
+        {/* Primary Categories */}
+        {primaryCategories.map((category) => (
+          <div key={category.title} className="space-y-3 sm:space-y-4">
+            <h4 className="text-sm sm:text-base font-semibold text-foreground text-left px-1">
               {category.title}
             </h4>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {category.messages.map((message) => (
                 <Button
                   key={message}
                   variant="outline"
-                  className={`h-auto whitespace-normal text-left text-xs sm:text-sm p-2 sm:p-3 transition-colors ${category.color} leading-relaxed min-h-[2.5rem]`}
+                  className={`h-auto whitespace-normal text-left text-sm sm:text-base p-4 transition-all hover:shadow-md ${category.color} leading-relaxed min-h-[3rem] font-medium`}
                   onClick={() => onMessageSelect(message)}
                   disabled={isLoading}
                 >
@@ -118,19 +132,67 @@ export function PredefinedMessages({ onMessageSelect, isLoading }: PredefinedMes
             </div>
           </div>
         ))}
+        
+        {/* View More Button */}
+        <div className="flex justify-center pt-2">
+          <Button
+            variant="ghost"
+            onClick={() => setShowMore(!showMore)}
+            className="text-sm sm:text-base font-medium text-primary hover:text-primary/80 gap-2"
+            disabled={isLoading}
+          >
+            {showMore ? (
+              <>
+                <ChevronUp className="h-4 w-4" />
+                View Less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4" />
+                View More Topics
+              </>
+            )}
+          </Button>
+        </div>
+        
+        {/* Additional Categories */}
+        {showMore && (
+          <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+            {additionalCategories.map((category) => (
+              <div key={category.title} className="space-y-3 sm:space-y-4">
+                <h4 className="text-sm sm:text-base font-semibold text-foreground text-left px-1">
+                  {category.title}
+                </h4>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {category.messages.map((message) => (
+                    <Button
+                      key={message}
+                      variant="outline"
+                      className={`h-auto whitespace-normal text-left text-sm sm:text-base p-4 transition-all hover:shadow-md ${category.color} leading-relaxed min-h-[3rem] font-medium`}
+                      onClick={() => onMessageSelect(message)}
+                      disabled={isLoading}
+                    >
+                      {message}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       
-      <div className="mt-4 sm:mt-6 space-y-2 text-center">
-        <div className="text-xs text-muted-foreground px-2">
-          💡 Tip: The more specific your question, the better I can help!
+      <div className="mt-6 sm:mt-8 space-y-3 text-center">
+        <div className="text-sm text-muted-foreground px-2 font-medium">
+          💡 Pro Tip: Ask specific questions for personalized recommendations
         </div>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs text-muted-foreground/70 px-2">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs text-muted-foreground/80 px-2">
           <div className="flex items-center gap-1">
             <span>Powered by</span>
-            <span className="font-semibold text-primary">Heroku Inference</span>
+            <span className="font-semibold text-primary">Advanced AI</span>
           </div>
           <span className="hidden sm:inline">•</span>
-          <span>AI Study Assistant</span>
+          <span>Personalized Study Intelligence</span>
         </div>
       </div>
     </div>
