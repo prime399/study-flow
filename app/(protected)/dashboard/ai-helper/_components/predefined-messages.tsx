@@ -102,7 +102,7 @@ export function PredefinedMessages({ onMessageSelect, isLoading }: PredefinedMes
       <div className="mb-6 sm:mb-8">
         <Bot className="mx-auto mb-3 sm:mb-4 h-12 w-12 sm:h-16 sm:w-16 text-primary" />
         <h3 className="mb-3 text-xl sm:text-2xl font-bold text-foreground">
-          AI Study Assistant
+          MentorMind
         </h3>
         <p className="max-w-lg text-sm sm:text-base text-muted-foreground leading-relaxed">
           Get personalized study advice, techniques, and insights based on your learning patterns. 

@@ -44,7 +44,7 @@ export default function AIHelperPage() {
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       {/* Header section - responsive layout */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-4 pb-2 sm:pb-4 shrink-0 border-b">
-        <PageTitle title="AI Study Assistant" />
+        <PageTitle title="MentorMind" />
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <ModelSelector
             selectedModel={selectedModel}

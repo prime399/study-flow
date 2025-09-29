@@ -35,3 +35,5 @@ npm-debug.log*
 next-env.d.ts
 
 .env
+dev.md
+prev.md
