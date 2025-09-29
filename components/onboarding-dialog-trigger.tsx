@@ -29,6 +29,7 @@ import * as z from "zod"
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { Skeleton } from "./ui/skeleton"
 import { ScrollArea } from "./ui/scroll-area"
+import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
   dailyGoal: z.number().min(1).max(1440),
@@ -50,11 +51,14 @@ export default function OnboardingDialogTrigger() {
 
 function OnboardingDialog() {
   const [open, setOpen] = useState(true)
+  const [isImportingSample, setIsImportingSample] = useState(false)
+  const [hasImportedSample, setHasImportedSample] = useState(false)
 
   const suggestedGroups = useQuery(api.onboarding.getSuggestedGroups, {
     limit: 4,
   })
   const completeOnboarding = useMutation(api.onboarding.completeOnboarding)
+  const importSampleSessions = useMutation(api.onboarding.importSampleStudySessions)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -78,6 +82,33 @@ function OnboardingDialog() {
       })
     } catch (error) {
       toast.error("Failed to save preferences. Please try again.")
+    }
+  }
+
+  async function handleImportSampleData() {
+    if (isImportingSample || hasImportedSample) {
+      return
+    }
+
+    try {
+      setIsImportingSample(true)
+      const result = await importSampleSessions()
+      setHasImportedSample(true)
+
+      if (result?.inserted > 0) {
+        toast.success("Sample study week ready!", {
+          description: `Added ${result.inserted} sessions to help you explore the dashboard.`,
+        })
+      } else {
+        toast.success("Sample sessions already loaded", {
+          description: "You're ready to explore with the demo data in place.",
+        })
+      }
+    } catch (error) {
+      setHasImportedSample(false)
+      toast.error("Unable to import sample sessions. Please try again.")
+    } finally {
+      setIsImportingSample(false)
     }
   }
 
@@ -236,9 +267,32 @@ function OnboardingDialog() {
                   )}
                 />
               ) : null}
-              <Button type="submit" className="w-full">
-                Start Studying
-              </Button>
+              <div className="space-y-2">
+                <Button type="submit" className="w-full">
+                  Start Studying
+                </Button>
+                <Button
+                  type="button"
+                  variant={hasImportedSample ? "secondary" : "outline"}
+                  className="w-full justify-center gap-2"
+                  onClick={handleImportSampleData}
+                  disabled={isImportingSample || hasImportedSample}
+                >
+                  {isImportingSample ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                      Importing sample week...
+                    </>
+                  ) : hasImportedSample ? (
+                    "Sample week ready"
+                  ) : (
+                    "Add sample study week"
+                  )}
+                </Button>
+                <p className="text-center text-xs text-muted-foreground">
+                  Populate your dashboard with a week of varied study sessions to explore the insights.
+                </p>
+              </div>
             </form>
           </Form>
         </ScrollArea>
