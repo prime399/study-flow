@@ -2,7 +2,6 @@
 
 import PageTitle from "@/components/page-title"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
@@ -27,6 +26,7 @@ export default function AIHelperPage() {
     error,
     messagesEndRef,
     selectedModel,
+    resolvedModel,
     setSelectedModel,
     handleSubmit,
     append,
@@ -48,6 +48,7 @@ export default function AIHelperPage() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <ModelSelector
             selectedModel={selectedModel}
+            resolvedModel={resolvedModel}
             onModelChange={setSelectedModel}
             disabled={isLoading}
           />
@@ -97,7 +98,7 @@ export default function AIHelperPage() {
             isLoading={isLoading}
             error={error}
             hasMessages={messages.length > 0}
-            selectedModel={selectedModel}
+            activeModel={resolvedModel}
           />
         </div>
       </div>

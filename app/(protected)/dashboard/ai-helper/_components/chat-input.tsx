@@ -7,7 +7,9 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { RefreshCw, Send, StopCircle } from "lucide-react"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
+
+import { AUTO_MODEL_ID, MODEL_LABELS } from "../_constants"
 
 interface ChatInputProps {
   input: string
@@ -18,7 +20,7 @@ interface ChatInputProps {
   isLoading: boolean
   error: string | null
   hasMessages: boolean
-  selectedModel: string
+  activeModel: string
 }
 
 export function ChatInput({
@@ -30,11 +32,16 @@ export function ChatInput({
   isLoading,
   error,
   hasMessages,
-  selectedModel
+  activeModel,
 }: ChatInputProps) {
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value)
   }, [setInput])
+
+  const modelLabel = useMemo(() => {
+    const fallback = MODEL_LABELS[AUTO_MODEL_ID]
+    return MODEL_LABELS[activeModel] ?? activeModel ?? fallback
+  }, [activeModel])
 
   return (
     <div className="">
@@ -75,9 +82,9 @@ export function ChatInput({
                 </Button>
               )
             )}
-            <Button 
-              type="submit" 
-              size="icon" 
+            <Button
+              type="submit"
+              size="icon"
               disabled={isLoading || !input.trim()}
               className="h-9 w-9 sm:h-10 sm:w-10"
             >
@@ -98,8 +105,8 @@ export function ChatInput({
           </div>
           <div className="flex items-center gap-1 sm:gap-2 text-xs overflow-hidden">
             <span className="hidden sm:inline">Powered by</span>
-            <span className="font-semibold text-primary truncate">{selectedModel}</span>
-            <span className="hidden sm:inline">•</span>
+            <span className="font-semibold text-primary truncate">{modelLabel}</span>
+            <span className="hidden sm:inline">|</span>
             <span className="text-muted-foreground/70 hidden lg:inline">Secure & Private</span>
           </div>
         </div>

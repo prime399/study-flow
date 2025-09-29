@@ -5,15 +5,15 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
-import { 
-  Message, 
-  generateId, 
-  saveMessagesToStorage, 
-  loadMessagesFromStorage, 
+import {
+  Message,
+  saveMessagesToStorage,
+  loadMessagesFromStorage,
   clearMessagesFromStorage,
   createUserMessage,
-  createAssistantMessage
+  createAssistantMessage,
 } from "../_components/chat-state"
+import { AUTO_MODEL_ID, DEFAULT_FALLBACK_MODEL_ID } from "../_constants"
 
 interface UseChatProps {
   studyStats: any
@@ -21,16 +21,32 @@ interface UseChatProps {
   userName?: string
 }
 
+type ModelPreference = string
+
+type AvailableModelsResponse = {
+  models?: { id: string }[]
+}
+
 export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  
+
   // State management
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [abortController, setAbortController] = useState<AbortController | null>(null)
-  const [selectedModel, setSelectedModel] = useState("gpt-oss-120b") // Default to original OpenAI OSS model
+  const [selectedModelState, setSelectedModelState] = useState<ModelPreference>(AUTO_MODEL_ID)
+  const [resolvedModel, setResolvedModel] = useState<string>(DEFAULT_FALLBACK_MODEL_ID)
+
+  const applyModelPreference = useCallback((modelId: string, fallbackResolved?: string) => {
+    setSelectedModelState(modelId)
+    if (modelId === AUTO_MODEL_ID) {
+      setResolvedModel(fallbackResolved ?? DEFAULT_FALLBACK_MODEL_ID)
+    } else {
+      setResolvedModel(modelId)
+    }
+  }, [])
 
   // Load messages and model preference from localStorage on mount
   useEffect(() => {
@@ -38,35 +54,36 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
     if (savedMessages.length > 0) {
       setMessages(savedMessages)
     }
-    
-    // Load saved model preference and validate it's available
-    const savedModel = localStorage.getItem("preferredModel")
-    if (savedModel) {
-      // Validate model availability by checking with backend
-      fetch('/api/ai-helper/models')
-        .then(res => res.json())
-        .then(data => {
-          if (data.models?.some((model: any) => model.id === savedModel)) {
-            setSelectedModel(savedModel)
-          } else {
-            // Model not available, use first available model
-            if (data.models?.length > 0) {
-              setSelectedModel(data.models[0].id)
-              localStorage.setItem("preferredModel", data.models[0].id)
-            }
-          }
-        })
-        .catch(err => {
-          console.warn("Failed to validate model availability:", err)
-          // Keep default model on error
-        })
-    }
-  }, [])
+
+    const savedPreference = localStorage.getItem("preferredModel") ?? AUTO_MODEL_ID
+
+    fetch("/api/ai-helper/models")
+      .then(res => res.json() as Promise<AvailableModelsResponse>)
+      .then(data => {
+        const availableModels = Array.isArray(data.models) ? data.models : []
+        const firstAvailable = availableModels[0]?.id ?? DEFAULT_FALLBACK_MODEL_ID
+
+        if (
+          savedPreference !== AUTO_MODEL_ID &&
+          availableModels.some(model => model.id === savedPreference)
+        ) {
+          applyModelPreference(savedPreference)
+        } else {
+          applyModelPreference(AUTO_MODEL_ID, firstAvailable)
+          localStorage.setItem("preferredModel", AUTO_MODEL_ID)
+        }
+      })
+      .catch(err => {
+        console.warn("Failed to validate model availability:", err)
+        const fallbackResolved = savedPreference === AUTO_MODEL_ID ? DEFAULT_FALLBACK_MODEL_ID : undefined
+        applyModelPreference(savedPreference, fallbackResolved)
+      })
+  }, [applyModelPreference])
 
   // Save model preference to localStorage
   useEffect(() => {
-    localStorage.setItem("preferredModel", selectedModel)
-  }, [selectedModel])
+    localStorage.setItem("preferredModel", selectedModelState)
+  }, [selectedModelState])
 
   // Save messages to localStorage
   useEffect(() => {
@@ -105,7 +122,7 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
           studyStats,
           groupInfo,
           userName,
-          modelId: selectedModel,
+          modelId: selectedModelState,
         }),
         signal: controller.signal,
       })
@@ -119,6 +136,12 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
         ? data.toolInvocations
         : []
 
+      if (typeof data.selectedModel === "string") {
+        setResolvedModel(data.selectedModel)
+      } else if (selectedModelState !== AUTO_MODEL_ID) {
+        setResolvedModel(selectedModelState)
+      }
+
       let assistantContent = ""
       if (data.choices && data.choices[0] && data.choices[0].message) {
         assistantContent = data.choices[0].message.content
@@ -128,9 +151,8 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
 
       const assistantMessage = createAssistantMessage(assistantContent, toolInvocations)
       setMessages(prev => [...prev, assistantMessage])
-
     } catch (err: any) {
-      if (err.name === 'AbortError') {
+      if (err.name === "AbortError") {
         toast.info("Request cancelled")
       } else {
         console.error("Error sending message:", err)
@@ -143,7 +165,7 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
       setIsLoading(false)
       setAbortController(null)
     }
-  }, [isLoading, messages, studyStats, groupInfo, userName, selectedModel])
+  }, [isLoading, messages, studyStats, groupInfo, userName, selectedModelState])
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
@@ -188,6 +210,10 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
     setError(null)
   }, [])
 
+  const setSelectedModel = useCallback((modelId: string) => {
+    applyModelPreference(modelId)
+  }, [applyModelPreference])
+
   return {
     messages,
     input,
@@ -195,7 +221,8 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
     isLoading,
     error,
     messagesEndRef,
-    selectedModel,
+    selectedModel: selectedModelState,
+    resolvedModel,
     setSelectedModel,
     handleSubmit,
     append,

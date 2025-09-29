@@ -3,25 +3,32 @@ import OpenAI from "openai"
 
 import { buildSystemPrompt } from "./_lib/system-prompt"
 import { sanitizeMessages } from "./_lib/message-sanitizer"
-import { 
-  validateOpenAIConfig, 
-  createOpenAIClient, 
+import {
+  validateOpenAIConfig,
+  createOpenAIClient,
   DEFAULT_COMPLETION_OPTIONS,
-  type ChatCompletionOptions 
+  type ChatCompletionOptions,
 } from "./_lib/openai-client"
 import { processAIResponse } from "./_lib/response-processor"
+import { resolveModelRouting } from "./_lib/model-router"
 
 export async function POST(req: Request) {
   try {
     const { messages, userName, studyStats, groupInfo, modelId }: AIRequestBody & { modelId?: string } =
       await req.json()
 
-    // Validate and get OpenAI configuration
-    const config = validateOpenAIConfig(modelId)
-    
+    const routingDecision = resolveModelRouting({
+      messages,
+      studyStats,
+      modelId,
+    })
+
+    // Validate and get OpenAI configuration for the resolved model
+    const config = validateOpenAIConfig(routingDecision.resolvedModelId)
+
     // Build system prompt with user context
     const systemPrompt = buildSystemPrompt({ userName, studyStats, groupInfo })
-    
+
     // Prepare chat messages
     const chatMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: "system", content: systemPrompt },
@@ -48,6 +55,8 @@ export async function POST(req: Request) {
       ...completion,
       choices,
       toolInvocations,
+      routing: routingDecision,
+      selectedModel: routingDecision.resolvedModelId,
     }
 
     return Response.json(responsePayload)

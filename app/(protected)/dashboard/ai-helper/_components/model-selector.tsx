@@ -7,8 +7,10 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Brain, Cpu, Zap, AlertTriangle } from "lucide-react"
+import { Brain, Cpu, Zap, AlertTriangle, Sparkles } from "lucide-react"
 import { useEffect, useState } from "react"
+
+import { AUTO_MODEL_ID } from "../_constants"
 
 export interface ModelInfo {
   id: string
@@ -21,6 +23,8 @@ export interface ModelInfo {
 
 const getIconForModel = (id: string) => {
   switch (id) {
+    case AUTO_MODEL_ID:
+      return <Sparkles className="h-4 w-4" />
     case "gpt-oss-120b":
     case "nova-pro":
       return <Brain className="h-4 w-4" />
@@ -33,8 +37,18 @@ const getIconForModel = (id: string) => {
   }
 }
 
+const AUTO_MODEL_OPTION: ModelInfo = {
+  id: AUTO_MODEL_ID,
+  name: "Smart Auto Route",
+  description: "MentorMind chooses the best model for each request.",
+  icon: getIconForModel(AUTO_MODEL_ID),
+  badge: "Auto",
+  badgeVariant: "secondary",
+}
+
 // Default models as fallback
 const DEFAULT_MODELS: ModelInfo[] = [
+  AUTO_MODEL_OPTION,
   {
     id: "gpt-oss-120b",
     name: "GPT OSS 120B",
@@ -53,7 +67,7 @@ const DEFAULT_MODELS: ModelInfo[] = [
   },
   {
     id: "nova-pro",
-    name: "Nova Pro", 
+    name: "Nova Pro",
     description: "Balanced performance for most tasks",
     icon: <Brain className="h-4 w-4" />,
     badge: "Pro",
@@ -71,11 +85,12 @@ const DEFAULT_MODELS: ModelInfo[] = [
 
 interface ModelSelectorProps {
   selectedModel: string
+  resolvedModel: string
   onModelChange: (modelId: string) => void
   disabled?: boolean
 }
 
-export function ModelSelector({ selectedModel, onModelChange, disabled = false }: ModelSelectorProps) {
+export function ModelSelector({ selectedModel, resolvedModel, onModelChange, disabled = false }: ModelSelectorProps) {
   const [availableModels, setAvailableModels] = useState<ModelInfo[]>(DEFAULT_MODELS)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -86,30 +101,39 @@ export function ModelSelector({ selectedModel, onModelChange, disabled = false }
       try {
         setIsLoading(true)
         setError(null)
-        
+
         const response = await fetch('/api/ai-helper/models')
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch available models')
         }
-        
+
         const data = await response.json()
-        
-        if (data.models && data.models.length > 0) {
-          const withIcons = data.models.map((m: ModelInfo) => ({ ...m, icon: getIconForModel(m.id) }))
-          setAvailableModels(withIcons)
-          
-          // If current selected model is not available, switch to first available
-          if (!withIcons.some((model: ModelInfo) => model.id === selectedModel)) {
-            onModelChange(withIcons[0].id)
+
+        const fetchedModels: ModelInfo[] = Array.isArray(data.models)
+          ? data.models.map((model: ModelInfo) => ({
+              ...model,
+              icon: getIconForModel(model.id),
+            }))
+          : []
+
+        if (fetchedModels.length > 0) {
+          const mergedModels = [AUTO_MODEL_OPTION, ...fetchedModels]
+          setAvailableModels(mergedModels)
+
+          if (
+            selectedModel !== AUTO_MODEL_ID &&
+            !fetchedModels.some(model => model.id === selectedModel)
+          ) {
+            onModelChange(fetchedModels[0].id)
           }
         } else {
           setError('No models available')
+          setAvailableModels(DEFAULT_MODELS)
         }
       } catch (err) {
         console.error('Error fetching models:', err)
         setError('Failed to load models')
-        // Fallback to default models
         setAvailableModels(DEFAULT_MODELS)
       } finally {
         setIsLoading(false)
@@ -120,6 +144,7 @@ export function ModelSelector({ selectedModel, onModelChange, disabled = false }
   }, [selectedModel, onModelChange])
 
   const currentModel = availableModels.find(model => model.id === selectedModel) || availableModels[0]
+  const resolvedModelInfo = availableModels.find(model => model.id === resolvedModel)
 
   if (error) {
     return (
@@ -134,13 +159,20 @@ export function ModelSelector({ selectedModel, onModelChange, disabled = false }
     <div className="flex items-center gap-2 w-full sm:w-auto">
       <span className="text-sm text-muted-foreground hidden lg:inline">Model:</span>
       <Select value={selectedModel} onValueChange={onModelChange} disabled={disabled || isLoading}>
-        <SelectTrigger className="w-full sm:w-[200px] lg:w-[220px] h-9 text-sm">
+        <SelectTrigger className="w-full sm:w-[220px] lg:w-[240px] h-9 text-sm">
           <SelectValue>
-            <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
               <span className="shrink-0">{currentModel?.icon}</span>
-              <span className="truncate text-xs sm:text-sm">
-                {isLoading ? 'Loading...' : currentModel?.name}
-              </span>
+              <div className="flex flex-col min-w-0">
+                <span className="truncate text-xs sm:text-sm">
+                  {isLoading ? 'Loading...' : currentModel?.name}
+                </span>
+                {selectedModel === AUTO_MODEL_ID && resolvedModelInfo && resolvedModelInfo.id !== AUTO_MODEL_ID && !isLoading && (
+                  <span className="hidden sm:inline text-[10px] text-muted-foreground truncate">
+                    Routing to {resolvedModelInfo.name}
+                  </span>
+                )}
+              </div>
               {currentModel?.badge && !isLoading && (
                 <Badge variant={currentModel.badgeVariant} className="text-xs px-1 sm:px-1.5 py-0.5 shrink-0 hidden sm:inline-flex">
                   {currentModel.badge}
@@ -163,7 +195,9 @@ export function ModelSelector({ selectedModel, onModelChange, disabled = false }
                   )}
                 </div>
                 <div className="text-xs text-muted-foreground pl-6">
-                  {model.description}
+                  {model.id === AUTO_MODEL_ID && resolvedModelInfo && resolvedModelInfo.id !== AUTO_MODEL_ID
+                    ? `Current: ${resolvedModelInfo.name}`
+                    : model.description}
                 </div>
               </div>
             </SelectItem>

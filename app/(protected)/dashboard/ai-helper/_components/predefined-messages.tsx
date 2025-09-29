@@ -189,7 +189,7 @@ export function PredefinedMessages({ onMessageSelect, isLoading }: PredefinedMes
         <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs text-muted-foreground/80 px-2">
           <div className="flex items-center gap-1">
             <span>Powered by</span>
-            <span className="font-semibold text-primary">Advanced AI</span>
+            <span className="font-semibold text-primary">Heroku Inference and Agents</span>
           </div>
           <span className="hidden sm:inline">•</span>
           <span>Personalized Study Intelligence</span>
