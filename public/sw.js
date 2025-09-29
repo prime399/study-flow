@@ -3,7 +3,7 @@ self.addEventListener("push", function (event) {
     const data = event.data.json()
     const options = {
       body: data.body,
-      icon: data.icon || "/favicon/favicon-32x32.png",
+      icon: data.icon || "/favicon/favicon-48x48.png",
       vibrate: [100, 50, 100],
       data: {
         dateOfArrival: Date.now(),
