@@ -50,6 +50,7 @@ export default defineSchema({
     studyDuration: v.number(),
     dailyGoal: v.optional(v.number()),
     totalStudyTime: v.number(),
+    coinsBalance: v.optional(v.number()),
     lastUpdated: v.number(),
   })
     .index("by_user", ["userId"])

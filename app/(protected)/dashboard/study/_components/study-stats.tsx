@@ -2,17 +2,19 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { formatHours, formatTimeTimer } from "@/lib/utils"
-import { ChartBar, Clock, Target, TrendingUp, Timer, Award } from "lucide-react"
+import { ChartBar, Clock, Target, TrendingUp, Timer, Award, Coins } from "lucide-react"
 import NumberFlow from "@number-flow/react"
 
 export default function StudyStats({
   studyTime,
   progress,
   totalStudyTime,
+  coinsBalance,
 }: {
   studyTime: number
   progress: number
   totalStudyTime: number
+  coinsBalance: number
 }) {
   const hours = Math.floor(totalStudyTime / 3600)
   const minutes = Math.floor((totalStudyTime % 3600) / 60)
@@ -39,7 +41,7 @@ export default function StudyStats({
   return (
     <div className="space-y-6">
       {/* Main Statistics Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {/* Current Session */}
         <Card className="relative overflow-hidden">
           <CardContent className="p-6">
@@ -97,7 +99,33 @@ export default function StudyStats({
             </div>
           </CardContent>
         </Card>
+
+        {/* Mentor Coins */}
+        <Card className="relative overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Coins className="h-4 w-4" />
+                  Mentor Coins
+                </p>
+                <div className="text-2xl font-bold tracking-tight">
+                  <NumberFlow value={coinsBalance} format={{ minimumIntegerDigits: 1 }} />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Earn coins by studying (1 second = 1 coin)
+                </p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center">
+                <Coins className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
 }
+
+
+

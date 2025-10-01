@@ -244,6 +244,7 @@ export default function StudyPage() {
               studyTime={studyTime}
               progress={progress}
               totalStudyTime={stats?.totalStudyTime ?? 0}
+              coinsBalance={stats?.coinsBalance ?? 0}
             />
           </TabsContent>
 

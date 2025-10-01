@@ -5,6 +5,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
+import { useMutation } from "convex/react"
+import { api } from "@/convex/_generated/api"
 import {
   Message,
   saveMessagesToStorage,
@@ -27,8 +29,13 @@ type AvailableModelsResponse = {
   models?: { id: string }[]
 }
 
+const COINS_PER_AI_MESSAGE = 100
+const COIN_SHORTAGE_MESSAGE =
+  "You need at least 100 coins to ask MentorMind. Start a study session to earn more coins (every second of study adds 1 coin)."
+
 export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const pendingCoinsRef = useRef(0)
 
   // State management
   const [messages, setMessages] = useState<Message[]>([])
@@ -38,6 +45,12 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
   const [abortController, setAbortController] = useState<AbortController | null>(null)
   const [selectedModelState, setSelectedModelState] = useState<ModelPreference>(AUTO_MODEL_ID)
   const [resolvedModel, setResolvedModel] = useState<string>(DEFAULT_FALLBACK_MODEL_ID)
+  const [coinBalance, setCoinBalance] = useState<number>(
+    typeof studyStats?.coinsBalance === "number" ? studyStats.coinsBalance : 0,
+  )
+
+  const spendCoins = useMutation(api.study.spendCoins)
+  const refundCoins = useMutation(api.study.refundCoins)
 
   const applyModelPreference = useCallback((modelId: string, fallbackResolved?: string) => {
     setSelectedModelState(modelId)
@@ -80,6 +93,13 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
       })
   }, [applyModelPreference])
 
+  // Sync coin balance whenever stats change (and no pending deductions)
+  useEffect(() => {
+    if (typeof studyStats?.coinsBalance === "number" && pendingCoinsRef.current === 0) {
+      setCoinBalance(studyStats.coinsBalance)
+    }
+  }, [studyStats?.coinsBalance])
+
   // Save model preference to localStorage
   useEffect(() => {
     localStorage.setItem("preferredModel", selectedModelState)
@@ -101,17 +121,29 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
   const sendMessage = useCallback(async (messageContent: string) => {
     if (!messageContent.trim() || isLoading) return
 
-    const userMessage = createUserMessage(messageContent)
-    setMessages(prev => [...prev, userMessage])
-    setInput("")
+    if (coinBalance < COINS_PER_AI_MESSAGE) {
+      setError(COIN_SHORTAGE_MESSAGE)
+      toast.error("Not enough coins", {
+        description: "Start a study session to earn coins. Every second of focused study gives you 1 coin.",
+      })
+      return
+    }
+
     setIsLoading(true)
     setError(null)
 
-    // Create abort controller for this request
     const controller = new AbortController()
     setAbortController(controller)
 
     try {
+      const spendResult = await spendCoins({ amount: COINS_PER_AI_MESSAGE, reason: "ai-helper" })
+      pendingCoinsRef.current = COINS_PER_AI_MESSAGE
+      setCoinBalance(spendResult.balance)
+
+      const userMessage = createUserMessage(messageContent)
+      setMessages(prev => [...prev, userMessage])
+      setInput("")
+
       const response = await fetch("/api/ai-helper", {
         method: "POST",
         headers: {
@@ -151,28 +183,45 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
 
       const assistantMessage = createAssistantMessage(assistantContent, toolInvocations)
       setMessages(prev => [...prev, assistantMessage])
+      pendingCoinsRef.current = 0
     } catch (err: any) {
-      if (err.name === "AbortError") {
+      if (pendingCoinsRef.current > 0) {
+        try {
+          const refundResult = await refundCoins({ amount: pendingCoinsRef.current, reason: "ai-helper-refund" })
+          setCoinBalance(refundResult.balance)
+        } catch (refundError) {
+          console.error("Failed to refund coins after error:", refundError)
+        } finally {
+          pendingCoinsRef.current = 0
+        }
+      }
+
+      if (err?.message === "INSUFFICIENT_COINS") {
+        setError(COIN_SHORTAGE_MESSAGE)
+        toast.error("Not enough coins", {
+          description: "Start a study session to earn coins. Every second of focused study gives you 1 coin.",
+        })
+      } else if (err?.name === "AbortError") {
         toast.info("Request cancelled")
       } else {
         console.error("Error sending message:", err)
-        setError(err.message)
+        setError(err?.message ?? "Something went wrong.")
         toast.error("Failed to get response", {
-          description: err.message,
+          description: err?.message ?? "Please try again.",
         })
       }
     } finally {
       setIsLoading(false)
       setAbortController(null)
     }
-  }, [isLoading, messages, studyStats, groupInfo, userName, selectedModelState])
+  }, [coinBalance, groupInfo, isLoading, messages, refundCoins, selectedModelState, spendCoins, studyStats, userName])
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     sendMessage(input)
   }, [input, sendMessage])
 
-  const append = useCallback((message: { role: "user", content: string }) => {
+  const append = useCallback((message: { role: "user"; content: string }) => {
     sendMessage(message.content)
   }, [sendMessage])
 
@@ -223,6 +272,8 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
     messagesEndRef,
     selectedModel: selectedModelState,
     resolvedModel,
+    coinBalance,
+    coinsRequired: COINS_PER_AI_MESSAGE,
     setSelectedModel,
     handleSubmit,
     append,

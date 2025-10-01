@@ -2,6 +2,8 @@ import { getAuthUserId } from "@convex-dev/auth/server"
 import { v } from "convex/values"
 import { mutation, query } from "./_generated/server"
 
+const INITIAL_COINS = 500
+
 export const isOnboardingComplete = query({
   args: {},
   handler: async (ctx) => {
@@ -50,19 +52,28 @@ export const completeOnboarding = mutation({
       .filter((q) => q.eq(q.field("userId"), userId))
       .first()
 
+    const now = Date.now()
+
     if (existingStudySettings) {
-      await ctx.db.patch(existingStudySettings._id, {
+      const update: Record<string, any> = {
         dailyGoal: args.dailyGoal,
         studyDuration: args.studyDuration,
-        lastUpdated: Date.now(),
-      })
+        lastUpdated: now,
+      }
+
+      if (typeof existingStudySettings.coinsBalance !== "number") {
+        update.coinsBalance = INITIAL_COINS
+      }
+
+      await ctx.db.patch(existingStudySettings._id, update)
     } else {
       await ctx.db.insert("studySettings", {
         userId,
         dailyGoal: args.dailyGoal,
         studyDuration: args.studyDuration,
         totalStudyTime: 0,
-        lastUpdated: Date.now(),
+        coinsBalance: INITIAL_COINS,
+        lastUpdated: now,
       })
     }
 
@@ -211,10 +222,18 @@ export const importSampleStudySessions = mutation({
         .filter((q) => q.eq(q.field("userId"), userId))
         .first()
 
+      const now = Date.now()
+
       if (studySettings) {
+        const currentCoins =
+          typeof studySettings.coinsBalance === "number"
+            ? studySettings.coinsBalance
+            : INITIAL_COINS
+
         await ctx.db.patch(studySettings._id, {
           totalStudyTime: studySettings.totalStudyTime + totalCompletedDuration,
-          lastUpdated: Date.now(),
+          coinsBalance: currentCoins + totalCompletedDuration,
+          lastUpdated: now,
         })
       } else {
         await ctx.db.insert("studySettings", {
@@ -222,7 +241,8 @@ export const importSampleStudySessions = mutation({
           studyDuration: 25 * 60,
           dailyGoal: 120 * 60,
           totalStudyTime: totalCompletedDuration,
-          lastUpdated: Date.now(),
+          coinsBalance: INITIAL_COINS + totalCompletedDuration,
+          lastUpdated: now,
         })
       }
     }
@@ -233,3 +253,4 @@ export const importSampleStudySessions = mutation({
     }
   },
 })
+

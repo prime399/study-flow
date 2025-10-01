@@ -3,9 +3,10 @@
 import PageTitle from "@/components/page-title"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Badge } from "@/components/ui/badge"
 import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
-import { TrashIcon } from "lucide-react"
+import { TrashIcon, Coins } from "lucide-react"
 
 import { useChat } from "./_hooks/use-chat"
 import { PredefinedMessages } from "./_components/predefined-messages"
@@ -34,6 +35,8 @@ export default function AIHelperPage() {
     reload,
     clearChat,
     clearError,
+    coinBalance,
+    coinsRequired,
   } = useChat({
     studyStats: getStudyStats,
     groupInfo: listMyGroups,
@@ -43,9 +46,16 @@ export default function AIHelperPage() {
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       {/* Header section - responsive layout */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-4 pb-2 sm:pb-4 shrink-0 border-b">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 px-4 py-3 sm:py-4 shrink-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <PageTitle title="MentorMind" />
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+          <Badge
+            variant="secondary"
+            className="flex items-center gap-2 justify-center px-4 py-1 text-xs whitespace-nowrap"
+          >
+            <Coins className="h-3 w-3" />
+            <span className="font-medium">{coinsRequired} coins per query</span>
+          </Badge>
           <ModelSelector
             selectedModel={selectedModel}
             resolvedModel={resolvedModel}
@@ -99,6 +109,8 @@ export default function AIHelperPage() {
             error={error}
             hasMessages={messages.length > 0}
             activeModel={resolvedModel}
+            coinBalance={coinBalance}
+            coinsRequired={coinsRequired}
           />
         </div>
       </div>

@@ -9,6 +9,7 @@ export type StudySession = {
 export type StudyStats = {
   totalStudyTime: number
   studyDuration: number
+  coinsBalance: number
   recentSessions: StudySession[]
   stats: {
     totalSessions: number

@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AlertTriangle, Bell } from "lucide-react"
@@ -22,7 +24,7 @@ export default function NotificationPermission() {
     }
   }
 
-  if (!("Notification" in window)) {
+  if (typeof window === "undefined" || !("Notification" in window)) {
     return null
   }
 
