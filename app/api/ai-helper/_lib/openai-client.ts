@@ -4,6 +4,11 @@
  */
 
 import OpenAI from "openai"
+import { randomUUID } from "crypto"
+
+type ToolCall = OpenAI.Chat.Completions.ChatCompletionMessageToolCall
+type FunctionToolCall = OpenAI.Chat.Completions.ChatCompletionMessageFunctionToolCall
+
 
 export interface OpenAIConfig {
   herokuBaseUrl: string
@@ -128,3 +133,142 @@ export const DEFAULT_COMPLETION_OPTIONS = {
   top_p: 0.95,
   max_tokens: 2048,
 } as const
+
+const STREAM_REQUIRED_MODELS: ReadonlySet<SupportedModelId> = new Set([
+  "gpt-oss-120b",
+])
+
+function shouldUseStreaming(modelId: string): boolean {
+  return STREAM_REQUIRED_MODELS.has(modelId as SupportedModelId)
+}
+
+async function streamChatCompletion(
+  client: OpenAI,
+  options: ChatCompletionOptions,
+): Promise<OpenAI.Chat.Completions.ChatCompletion> {
+  const stream = await client.chat.completions.create({
+    ...options,
+    stream: true,
+  })
+
+  let aggregatedContent = ""
+  let refusal: string | null = null
+  let finishReason: OpenAI.Chat.Completions.ChatCompletion.Choice["finish_reason"] = "stop"
+  let id: string | undefined
+  let model = options.model
+  let created = Math.floor(Date.now() / 1000)
+  let systemFingerprint: string | undefined
+  let usage: OpenAI.Chat.Completions.ChatCompletion["usage"] | undefined
+  const toolCalls: ToolCall[] = []
+
+  for await (const chunk of stream) {
+    if (!chunk) {
+      continue
+    }
+
+    id = chunk.id ?? id
+    model = (chunk.model as typeof model) ?? model
+    systemFingerprint = chunk.system_fingerprint ?? systemFingerprint
+
+    if (typeof chunk.created === "number") {
+      created = chunk.created
+    }
+
+    if (chunk.usage) {
+      usage = chunk.usage
+    }
+
+    const choice = chunk.choices?.[0]
+    if (!choice) {
+      continue
+    }
+
+    if (choice.finish_reason) {
+      finishReason = choice.finish_reason
+    }
+
+    const delta = choice.delta
+
+    if (delta?.content) {
+      aggregatedContent += delta.content
+    }
+
+    if (delta?.refusal) {
+      refusal = `${refusal ?? ""}${delta.refusal}`
+    }
+
+    if (delta?.tool_calls) {
+      delta.tool_calls.forEach((toolCallDelta: any, toolIndex: number) => {
+        const targetIndex = toolCallDelta.index ?? toolIndex
+        let toolCall = toolCalls[targetIndex]
+
+        if (!toolCall || toolCall.type !== "function") {
+          toolCall = {
+            id: toolCallDelta.id ?? `tool-${targetIndex}`,
+            type: "function",
+            function: {
+              name: toolCallDelta.function?.name ?? "",
+              arguments: "",
+            },
+          }
+          toolCalls[targetIndex] = toolCall
+        }
+
+        const functionCall = toolCall as FunctionToolCall
+
+        if (toolCallDelta.id) {
+          functionCall.id = toolCallDelta.id
+        }
+
+        if (toolCallDelta.function?.name) {
+          functionCall.function.name = toolCallDelta.function.name
+        }
+
+        if (toolCallDelta.function?.arguments) {
+          functionCall.function.arguments = `${functionCall.function.arguments}${toolCallDelta.function.arguments}`
+        }
+      })
+    }
+  }
+
+  const completionId =
+    id ?? `stream-${typeof randomUUID === "function" ? randomUUID() : Date.now().toString(36)}`
+
+  return {
+    id: completionId,
+    object: "chat.completion",
+    created,
+    model,
+    system_fingerprint: systemFingerprint,
+    usage: usage ?? {
+      prompt_tokens: 0,
+      completion_tokens: 0,
+      total_tokens: 0,
+    },
+    choices: [
+      {
+        index: 0,
+        finish_reason: finishReason ?? "stop",
+        message: {
+          role: "assistant",
+          content: aggregatedContent,
+          refusal,
+          tool_calls: toolCalls.length > 0 ? toolCalls : undefined,
+        },
+        logprobs: null,
+      },
+    ],
+  }
+}
+
+export async function fetchChatCompletion(
+  client: OpenAI,
+  options: ChatCompletionOptions,
+): Promise<OpenAI.Chat.Completions.ChatCompletion> {
+  if (shouldUseStreaming(options.model)) {
+    return streamChatCompletion(client, options)
+  }
+
+  return client.chat.completions.create(options)
+}
+

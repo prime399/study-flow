@@ -50,10 +50,10 @@ const AUTO_MODEL_OPTION: ModelInfo = {
 const DEFAULT_MODELS: ModelInfo[] = [
   AUTO_MODEL_OPTION,
   {
-    id: "gpt-oss-120b",
-    name: "GPT OSS 120B",
-    description: "Proven OpenAI OSS model - reliable and versatile",
-    icon: <Brain className="h-4 w-4" />,
+    id: "claude-3-5-haiku",
+    name: "Claude 3.5 Haiku",
+    description: "Balanced reasoning model recommended for most study help.",
+    icon: <Cpu className="h-4 w-4" />,
     badge: "Recommended",
     badgeVariant: "default",
   },
@@ -74,11 +74,10 @@ const DEFAULT_MODELS: ModelInfo[] = [
     badgeVariant: "outline",
   },
   {
-    id: "claude-3-5-haiku",
-    name: "Claude 3.5 Haiku",
-    description: "Advanced reasoning and detailed analysis",
-    icon: <Cpu className="h-4 w-4" />,
-    badge: "Advanced",
+    id: "gpt-oss-120b",
+    name: "GPT OSS 120B",
+    description: "OpenAI OSS model kept as a reliable fallback option",
+    icon: <Brain className="h-4 w-4" />,
     badgeVariant: "outline",
   },
 ] as const
@@ -207,3 +206,4 @@ export function ModelSelector({ selectedModel, resolvedModel, onModelChange, dis
     </div>
   )
 }
+

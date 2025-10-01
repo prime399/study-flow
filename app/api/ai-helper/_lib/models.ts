@@ -36,10 +36,8 @@ export const ALL_MODELS: ModelInfo[] = [
   {
     id: "gpt-oss-120b",
     name: "GPT OSS 120B",
-    description: "Proven OpenAI OSS model - reliable and versatile",
+    description: "OpenAI OSS model kept as a reliable fallback option",
     icon: React.createElement(BrainIcon),
-    badge: "Recommended",
-    badgeVariant: "default",
   },
   {
     id: "nova-lite", 
@@ -60,10 +58,10 @@ export const ALL_MODELS: ModelInfo[] = [
   {
     id: "claude-3-5-haiku",
     name: "Claude 3.5 Haiku",
-    description: "Advanced reasoning and detailed analysis",
+    description: "Balanced reasoning model recommended for most study help.",
     icon: React.createElement(CpuIcon),
-    badge: "Advanced",
-    badgeVariant: "outline",
+    badge: "Recommended",
+    badgeVariant: "default",
   },
 ] as const
 

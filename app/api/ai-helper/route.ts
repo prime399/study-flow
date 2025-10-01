@@ -7,6 +7,7 @@ import {
   validateOpenAIConfig,
   createOpenAIClient,
   DEFAULT_COMPLETION_OPTIONS,
+  fetchChatCompletion,
   type ChatCompletionOptions,
 } from "./_lib/openai-client"
 import { processAIResponse } from "./_lib/response-processor"
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
     }
 
     // Get AI completion
-    const completion = await client.chat.completions.create(completionOptions)
+    const completion = await fetchChatCompletion(client, completionOptions)
 
     // Process response and extract tables
     const { choices, toolInvocations } = processAIResponse(completion)

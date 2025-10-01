@@ -242,8 +242,8 @@ function buildPreferences(
     return pickFirstAvailable([
       "nova-lite",
       "nova-pro",
-      "gpt-oss-120b",
       "claude-3-5-haiku",
+      "gpt-oss-120b",
     ], available)
   }
 
@@ -258,54 +258,54 @@ function buildPreferences(
 
   if (requirement.value === "planning") {
     return pickFirstAvailable([
-      "gpt-oss-120b",
+      "claude-3-5-haiku",
       "nova-pro",
       "nova-lite",
-      "claude-3-5-haiku",
+      "gpt-oss-120b",
     ], available)
   }
 
   if (requirement.value === "creative") {
     return pickFirstAvailable([
       "nova-pro",
-      "gpt-oss-120b",
       "claude-3-5-haiku",
+      "gpt-oss-120b",
       "nova-lite",
     ], available)
   }
 
   if (requirement.value === "motivation") {
     return pickFirstAvailable([
-      "gpt-oss-120b",
       "claude-3-5-haiku",
       "nova-pro",
+      "gpt-oss-120b",
       "nova-lite",
     ], available)
   }
 
   if (condition.value === "burnout") {
     return pickFirstAvailable([
-      "gpt-oss-120b",
       "claude-3-5-haiku",
       "nova-pro",
+      "gpt-oss-120b",
       "nova-lite",
     ], available)
   }
 
   if (condition.value === "struggling") {
     return pickFirstAvailable([
-      "gpt-oss-120b",
-      "nova-pro",
       "claude-3-5-haiku",
+      "nova-pro",
+      "gpt-oss-120b",
       "nova-lite",
     ], available)
   }
 
   return pickFirstAvailable([
-    "nova-pro",
-    "gpt-oss-120b",
-    "nova-lite",
     "claude-3-5-haiku",
+    "nova-pro",
+    "nova-lite",
+    "gpt-oss-120b",
   ], available)
 }
 
