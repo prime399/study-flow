@@ -3,10 +3,10 @@
 import PageTitle from "@/components/page-title"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from "@/components/ui/badge"
+
 import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
-import { TrashIcon, Coins } from "lucide-react"
+import { TrashIcon } from "lucide-react"
 
 import { useChat } from "./_hooks/use-chat"
 import { PredefinedMessages } from "./_components/predefined-messages"
@@ -49,16 +49,9 @@ export default function AIHelperPage() {
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       {/* Header section - responsive layout */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 px-4 py-3 sm:py-4 shrink-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 px-4 py-3 shrink-0 border-b">
         <PageTitle title="MentorMind" />
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-          <Badge
-            variant="secondary"
-            className="flex items-center gap-2 justify-center px-4 py-1 text-xs whitespace-nowrap"
-          >
-            <Coins className="h-3 w-3" />
-            <span className="font-medium">{coinsRequired} coins per query</span>
-          </Badge>
+        <div className="flex flex-row items-center gap-2">
           <ModelSelector
             selectedModel={selectedModel}
             resolvedModel={resolvedModel}
@@ -71,13 +64,13 @@ export default function AIHelperPage() {
             disabled={isLoading}
           />
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={clearChat}
-            className="gap-2 w-full sm:w-auto"
+            className="gap-2"
           >
             <TrashIcon className="h-4 w-4" />
-            <span className="sm:inline">Clear Chat</span>
+            <span className="hidden sm:inline">Clear</span>
           </Button>
         </div>
       </div>

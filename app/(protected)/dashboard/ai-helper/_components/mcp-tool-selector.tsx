@@ -2,13 +2,13 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Ban, Wrench, Loader2 } from "lucide-react"
+import { Sparkles, Wrench, Loader2 } from "lucide-react"
 import { useMemo, useEffect, useState, type ReactNode } from "react"
 
 import { DEFAULT_MCP_TOOL, MCP_TOOLS, type McpToolId, type DynamicMcpTool } from "../_constants"
 
 const TOOL_ICON: Record<string, ReactNode> = {
-  none: <Ban className="h-4 w-4" />,
+  none: <Sparkles className="h-4 w-4" />,
   default: <Wrench className="h-4 w-4" />,
 }
 
@@ -81,14 +81,7 @@ export function McpToolSelector({ selectedTool, onToolChange, disabled = false }
             ) : (
               <div className="flex items-center gap-2 min-w-0">
                 <span className="shrink-0">{getToolIcon(activeTool.id)}</span>
-                <div className="flex flex-col min-w-0">
-                  <span className="truncate text-xs sm:text-sm">{activeTool.label}</span>
-                  {activeTool.id !== DEFAULT_MCP_TOOL && (
-                    <span className="hidden sm:inline text-[10px] text-muted-foreground truncate">
-                      Requires URL input
-                    </span>
-                  )}
-                </div>
+                <span className="truncate text-xs sm:text-sm">{activeTool.label}</span>
                 {!activeTool.isStatic && (
                   <Badge variant="secondary" className="text-xs px-1 sm:px-1.5 py-0.5 shrink-0 hidden sm:inline-flex">
                     MCP

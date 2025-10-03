@@ -57,16 +57,14 @@ export function ChatInput({
     setShowKeyboardHint(!keyboardHintDismissed)
   }, [])
 
-  // Show MCP hint when MCP tool is first selected
+  // Show MCP hint when user hasn't seen it yet
   useEffect(() => {
     const mcpHintDismissed = localStorage.getItem(MCP_HINT_KEY) === "true"
     
-    if (selectedMcpTool !== DEFAULT_MCP_TOOL && !mcpHintDismissed) {
+    if (!mcpHintDismissed) {
       setShowMcpHint(true)
-    } else {
-      setShowMcpHint(false)
     }
-  }, [selectedMcpTool])
+  }, [])
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value)
@@ -76,11 +74,7 @@ export function ChatInput({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       if (input.trim() && !isLoading && !insufficientCoins) {
-        // Dismiss hints on first use
-        if (showMcpHint) {
-          localStorage.setItem(MCP_HINT_KEY, "true")
-          setShowMcpHint(false)
-        }
+        // Dismiss keyboard hint on first use
         if (showKeyboardHint) {
           localStorage.setItem(KEYBOARD_HINT_KEY, "true")
           setShowKeyboardHint(false)
@@ -88,7 +82,7 @@ export function ChatInput({
         onSubmit(e as any)
       }
     }
-  }, [input, isLoading, insufficientCoins, onSubmit, showMcpHint, showKeyboardHint])
+  }, [input, isLoading, insufficientCoins, onSubmit, showKeyboardHint])
 
   // Auto-resize textarea
   useEffect(() => {
@@ -108,12 +102,26 @@ export function ChatInput({
     <div className="">
       <div className="p-2 sm:p-4">
         <form onSubmit={onSubmit} className="flex flex-col gap-2">
-          {showMcpHint && isMcpToolSelected && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
-              <Sparkles className="h-4 w-4 text-primary shrink-0" />
-              <p className="text-xs text-muted-foreground">
-                <span className="font-medium text-primary">MCP Tool Active:</span> You can include URLs directly in your message, and I&apos;ll use the tool to fetch and process them.
-              </p>
+          {showMcpHint && (
+            <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary shrink-0" />
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-medium text-primary">MCP Tools Available:</span> I can use external tools to fetch and process URLs when needed. {isMcpToolSelected && "You've selected a preferred tool in the toolbar."}
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  localStorage.setItem(MCP_HINT_KEY, "true")
+                  setShowMcpHint(false)
+                }}
+                className="h-6 px-2 text-xs shrink-0"
+              >
+                Got it
+              </Button>
             </div>
           )}
           <div className="flex items-start gap-2">
@@ -123,7 +131,7 @@ export function ChatInput({
                 value={input}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
-                placeholder={isMcpToolSelected ? "Ask anything and include URLs directly in your message..." : "Ask anything about studying..."}
+                placeholder="Ask anything... (I can use tools to fetch URLs when needed)"
                 disabled={isLoading || (error != null && !insufficientCoins)}
                 className="min-h-[44px] max-h-[200px] resize-none text-sm sm:text-base pr-12"
                 rows={1}

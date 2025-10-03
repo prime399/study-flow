@@ -1,12 +1,6 @@
 import { AIRequestBody } from "@/lib/types"
 import OpenAI from "openai"
 
-import {
-  DEFAULT_MCP_TOOL,
-  MCP_TOOLS,
-  type McpToolId,
-} from "../../(protected)/dashboard/ai-helper/_constants"
-
 import { buildSystemPrompt } from "./_lib/system-prompt"
 import { sanitizeMessages } from "./_lib/message-sanitizer"
 import {
@@ -19,40 +13,50 @@ import {
 import { processAIResponse } from "./_lib/response-processor"
 import { resolveModelRouting } from "./_lib/model-router"
 
-
-interface McpToolConfig {
-  toolId: string
-  systemInstruction: string
+interface McpTool {
+  id: string
+  name: string
+  namespace: string
+  description: string
+  inputSchema?: any
 }
 
-function resolveMcpToolConfig(requestedToolId?: string | null): McpToolConfig | null {
-  if (!requestedToolId || requestedToolId === DEFAULT_MCP_TOOL) {
-    return null
-  }
-
-  return {
-    toolId: requestedToolId,
-    systemInstruction:
-      "When you use MCP tools that require a URL, extract the URL from the user's message and use it with the tool. The user can provide URLs directly in their message.",
+async function fetchAvailableMcpTools(): Promise<McpTool[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const response = await fetch(`${baseUrl}/api/ai-helper/mcp-servers`, {
+      cache: 'no-store'
+    })
+    
+    if (!response.ok) {
+      console.warn('Failed to fetch MCP tools, continuing without them')
+      return []
+    }
+    
+    const data = await response.json()
+    return data.tools || []
+  } catch (error) {
+    console.warn('Error fetching MCP tools:', error)
+    return []
   }
 }
 
 async function callHerokuAgentsEndpoint(
   config: { herokuBaseUrl: string; herokuApiKey: string; herokuModelId: string },
   messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-  mcpToolId: string
+  mcpTools: McpTool[]
 ) {
   const agentsUrl = `${config.herokuBaseUrl.replace(/\/$/, "")}/v1/agents/heroku`
   
+  const toolsArray = mcpTools.map(tool => ({
+    type: "mcp",
+    name: tool.id,
+  }))
+
   const requestBody: any = {
     model: config.herokuModelId,
     messages,
-    tools: [
-      {
-        type: "mcp",
-        name: mcpToolId,
-      }
-    ],
+    tools: toolsArray,
   }
 
   const response = await fetch(agentsUrl, {
@@ -73,7 +77,6 @@ async function callHerokuAgentsEndpoint(
   const text = await response.text()
   const lines = text.split('\n')
   let lastCompletion: any = null
-  let toolResults: any[] = []
 
   for (const line of lines) {
     if (line.startsWith('data:')) {
@@ -113,16 +116,25 @@ export async function POST(req: Request) {
     // Validate and get OpenAI configuration for the resolved model
     const config = validateOpenAIConfig(routingDecision.resolvedModelId)
 
-    const mcpToolConfig = resolveMcpToolConfig(mcpToolId)
+    // Fetch all available MCP tools
+    const availableMcpTools = await fetchAvailableMcpTools()
 
     // Build system prompt with user context
     const baseSystemPrompt = buildSystemPrompt({ userName, studyStats, groupInfo })
     let systemPrompt = baseSystemPrompt
     
-    if (mcpToolConfig) {
+    // Add MCP tool instruction if tools are available
+    if (availableMcpTools.length > 0) {
+      const toolsList = availableMcpTools
+        .map(tool => `- ${tool.name}: ${tool.description}`)
+        .join('\n')
+      
       systemPrompt = `${baseSystemPrompt}
 
-${mcpToolConfig.systemInstruction}`
+You have access to the following MCP tools to help answer questions:
+${toolsList}
+
+When using these tools, extract any required information (like URLs) directly from the user's message. Use these tools proactively when they can help provide better answers.`
     }
 
     // Prepare chat messages
@@ -133,15 +145,15 @@ ${mcpToolConfig.systemInstruction}`
 
     let completion: OpenAI.Chat.Completions.ChatCompletion
 
-    // Use Heroku Agents endpoint for MCP tools
-    if (mcpToolConfig) {
+    // Use Heroku Agents endpoint with all available MCP tools
+    if (availableMcpTools.length > 0) {
       completion = await callHerokuAgentsEndpoint(
         config,
         chatMessages,
-        mcpToolConfig.toolId
+        availableMcpTools
       )
     } else {
-      // Use standard OpenAI client for non-MCP requests
+      // Fall back to standard OpenAI client if no MCP tools available
       const client = createOpenAIClient(config)
       
       const completionOptions: ChatCompletionOptions = {

@@ -14,8 +14,8 @@ export const MODEL_LABELS: Record<string, string> = {
 export const MCP_TOOLS = [
   {
     id: "none",
-    label: "No Remote Tool",
-    description: "MentorMind will not call external MCP tools.",
+    label: "Auto-Select Tools",
+    description: "Let MentorMind automatically choose the best tool for each task.",
   },
 ] as const
 
