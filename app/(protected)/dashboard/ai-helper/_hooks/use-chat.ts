@@ -15,7 +15,13 @@ import {
   createUserMessage,
   createAssistantMessage,
 } from "../_components/chat-state"
-import { AUTO_MODEL_ID, DEFAULT_FALLBACK_MODEL_ID } from "../_constants"
+import {
+  AUTO_MODEL_ID,
+  DEFAULT_FALLBACK_MODEL_ID,
+  DEFAULT_MCP_TOOL,
+  MCP_TOOLS,
+  type McpToolId,
+} from "../_constants"
 
 interface UseChatProps {
   studyStats: any
@@ -33,6 +39,8 @@ const COINS_PER_AI_MESSAGE = 100
 const COIN_SHORTAGE_MESSAGE =
   "You need at least 100 coins to ask MentorMind. Start a study session to earn more coins (every second of study adds 1 coin)."
 
+const MCP_TOOL_STORAGE_KEY = "preferredMcpTool"
+
 export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const pendingCoinsRef = useRef(0)
@@ -44,6 +52,7 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
   const [error, setError] = useState<string | null>(null)
   const [abortController, setAbortController] = useState<AbortController | null>(null)
   const [selectedModelState, setSelectedModelState] = useState<ModelPreference>(AUTO_MODEL_ID)
+  const [selectedMcpToolState, setSelectedMcpToolState] = useState<McpToolId>(DEFAULT_MCP_TOOL)
   const [resolvedModel, setResolvedModel] = useState<string>(DEFAULT_FALLBACK_MODEL_ID)
   const [coinBalance, setCoinBalance] = useState<number>(
     typeof studyStats?.coinsBalance === "number" ? studyStats.coinsBalance : 0,
@@ -69,6 +78,11 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
     }
 
     const savedPreference = localStorage.getItem("preferredModel") ?? AUTO_MODEL_ID
+
+    const savedMcpTool = localStorage.getItem(MCP_TOOL_STORAGE_KEY)
+    if (savedMcpTool && MCP_TOOLS.some(tool => tool.id === savedMcpTool)) {
+      setSelectedMcpToolState(savedMcpTool as McpToolId)
+    }
 
     fetch("/api/ai-helper/models")
       .then(res => res.json() as Promise<AvailableModelsResponse>)
@@ -104,6 +118,11 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
   useEffect(() => {
     localStorage.setItem("preferredModel", selectedModelState)
   }, [selectedModelState])
+
+  // Save MCP tool preference to localStorage
+  useEffect(() => {
+    localStorage.setItem(MCP_TOOL_STORAGE_KEY, selectedMcpToolState)
+  }, [selectedMcpToolState])
 
   // Save messages to localStorage
   useEffect(() => {
@@ -155,6 +174,7 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
           groupInfo,
           userName,
           modelId: selectedModelState,
+          mcpToolId: selectedMcpToolState !== DEFAULT_MCP_TOOL ? selectedMcpToolState : undefined,
         }),
         signal: controller.signal,
       })
@@ -214,7 +234,7 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
       setIsLoading(false)
       setAbortController(null)
     }
-  }, [coinBalance, groupInfo, isLoading, messages, refundCoins, selectedModelState, spendCoins, studyStats, userName])
+  }, [coinBalance, groupInfo, isLoading, messages, refundCoins, selectedModelState, selectedMcpToolState, spendCoins, studyStats, userName])
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault()
@@ -263,6 +283,10 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
     applyModelPreference(modelId)
   }, [applyModelPreference])
 
+  const setSelectedMcpTool = useCallback((toolId: McpToolId) => {
+    setSelectedMcpToolState(toolId)
+  }, [])
+
   return {
     messages,
     input,
@@ -274,7 +298,9 @@ export function useChat({ studyStats, groupInfo, userName }: UseChatProps) {
     resolvedModel,
     coinBalance,
     coinsRequired: COINS_PER_AI_MESSAGE,
+    selectedMcpTool: selectedMcpToolState,
     setSelectedModel,
+    setSelectedMcpTool,
     handleSubmit,
     append,
     stop,

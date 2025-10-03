@@ -126,6 +126,8 @@ export interface ChatCompletionOptions {
   temperature?: number
   top_p?: number
   max_tokens?: number
+  tools?: OpenAI.Chat.Completions.ChatCompletionTool[]
+  tool_choice?: OpenAI.Chat.Completions.ChatCompletionToolChoiceOption
 }
 
 export const DEFAULT_COMPLETION_OPTIONS = {

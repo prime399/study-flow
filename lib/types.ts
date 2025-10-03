@@ -23,6 +23,7 @@ export type AIRequestBody = {
   userName: string | undefined
   studyStats: StudyStats | undefined
   groupInfo: any[]
+  mcpToolId?: string
 }
 
 export interface CalendarEvent {

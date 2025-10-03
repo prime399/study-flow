@@ -5,11 +5,11 @@
  */
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { RefreshCw, Send, StopCircle, Coins } from "lucide-react"
-import { useCallback, useMemo } from "react"
+import { Textarea } from "@/components/ui/textarea"
+import { RefreshCw, Send, StopCircle, Coins, Sparkles } from "lucide-react"
+import { useCallback, useMemo, useRef, useEffect, useState } from "react"
 
-import { AUTO_MODEL_ID, MODEL_LABELS } from "../_constants"
+import { AUTO_MODEL_ID, MODEL_LABELS, DEFAULT_MCP_TOOL, type McpToolId } from "../_constants"
 
 interface ChatInputProps {
   input: string
@@ -23,7 +23,11 @@ interface ChatInputProps {
   activeModel: string
   coinBalance: number
   coinsRequired: number
+  selectedMcpTool: McpToolId
 }
+
+const MCP_HINT_KEY = "mcpHintDismissed"
+const KEYBOARD_HINT_KEY = "keyboardHintDismissed"
 
 export function ChatInput({
   input,
@@ -37,32 +41,101 @@ export function ChatInput({
   activeModel,
   coinBalance,
   coinsRequired,
+  selectedMcpTool,
 }: ChatInputProps) {
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [showMcpHint, setShowMcpHint] = useState(false)
+  const [showKeyboardHint, setShowKeyboardHint] = useState(true)
+
+  const insufficientCoins = coinBalance < coinsRequired
+  const isMcpToolSelected = selectedMcpTool !== DEFAULT_MCP_TOOL
+  const charCount = input.length
+
+  // Load hint preferences from localStorage
+  useEffect(() => {
+    const keyboardHintDismissed = localStorage.getItem(KEYBOARD_HINT_KEY) === "true"
+    setShowKeyboardHint(!keyboardHintDismissed)
+  }, [])
+
+  // Show MCP hint when MCP tool is first selected
+  useEffect(() => {
+    const mcpHintDismissed = localStorage.getItem(MCP_HINT_KEY) === "true"
+    
+    if (selectedMcpTool !== DEFAULT_MCP_TOOL && !mcpHintDismissed) {
+      setShowMcpHint(true)
+    } else {
+      setShowMcpHint(false)
+    }
+  }, [selectedMcpTool])
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value)
   }, [setInput])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (input.trim() && !isLoading && !insufficientCoins) {
+        // Dismiss hints on first use
+        if (showMcpHint) {
+          localStorage.setItem(MCP_HINT_KEY, "true")
+          setShowMcpHint(false)
+        }
+        if (showKeyboardHint) {
+          localStorage.setItem(KEYBOARD_HINT_KEY, "true")
+          setShowKeyboardHint(false)
+        }
+        onSubmit(e as any)
+      }
+    }
+  }, [input, isLoading, insufficientCoins, onSubmit, showMcpHint, showKeyboardHint])
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.style.height = 'auto'
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`
+    }
+  }, [input])
 
   const modelLabel = useMemo(() => {
     const fallback = MODEL_LABELS[AUTO_MODEL_ID]
     return MODEL_LABELS[activeModel] ?? activeModel ?? fallback
   }, [activeModel])
 
-  const insufficientCoins = coinBalance < coinsRequired
-
   return (
     <div className="">
       <div className="p-2 sm:p-4">
         <form onSubmit={onSubmit} className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Input
-              value={input}
-              onChange={handleInputChange}
-              placeholder="Ask anything about studying..."
-              disabled={isLoading || (error != null && !insufficientCoins)}
-              className="flex-1 text-sm sm:text-base"
-              autoFocus
-            />
-            <div className="flex gap-1 sm:gap-2 shrink-0">
+          {showMcpHint && isMcpToolSelected && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
+              <Sparkles className="h-4 w-4 text-primary shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                <span className="font-medium text-primary">MCP Tool Active:</span> You can include URLs directly in your message, and I&apos;ll use the tool to fetch and process them.
+              </p>
+            </div>
+          )}
+          <div className="flex items-start gap-2">
+            <div className="flex-1 relative">
+              <Textarea
+                ref={textareaRef}
+                value={input}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder={isMcpToolSelected ? "Ask anything and include URLs directly in your message..." : "Ask anything about studying..."}
+                disabled={isLoading || (error != null && !insufficientCoins)}
+                className="min-h-[44px] max-h-[200px] resize-none text-sm sm:text-base pr-12"
+                rows={1}
+                autoFocus
+              />
+              {charCount > 0 && (
+                <div className="absolute bottom-2 right-2 text-xs text-muted-foreground/60">
+                  {charCount}
+                </div>
+              )}
+            </div>
+            <div className="flex gap-1 sm:gap-2 shrink-0 pt-1">
               {isLoading ? (
                 <Button
                   type="button"
@@ -70,6 +143,7 @@ export function ChatInput({
                   size="icon"
                   onClick={onStop}
                   className="h-9 w-9 sm:h-10 sm:w-10"
+                  title="Stop generation"
                 >
                   <StopCircle className="h-4 w-4" />
                 </Button>
@@ -84,6 +158,7 @@ export function ChatInput({
                       onReload()
                     }}
                     className="h-9 w-9 sm:h-10 sm:w-10"
+                    title="Retry last message"
                   >
                     <RefreshCw className="h-4 w-4" />
                   </Button>
@@ -94,11 +169,26 @@ export function ChatInput({
                 size="icon"
                 disabled={isLoading || !input.trim() || insufficientCoins}
                 className="h-9 w-9 sm:h-10 sm:w-10"
+                title="Send message (Enter)"
               >
                 <Send className="h-4 w-4" />
               </Button>
             </div>
           </div>
+
+          {showKeyboardHint && (
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-xs text-muted-foreground">
+                <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-muted rounded">Enter</kbd> to send • 
+                <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-muted rounded ml-1">Shift + Enter</kbd> for new line
+              </div>
+              {charCount > 1000 && (
+                <p className="text-xs text-orange-500">
+                  Long messages may use more tokens
+                </p>
+              )}
+            </div>
+          )}
 
           {insufficientCoins && (
             <p className="text-xs text-destructive">
@@ -138,4 +228,3 @@ export function ChatInput({
     </div>
   )
 }
-

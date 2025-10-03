@@ -13,6 +13,7 @@ import { PredefinedMessages } from "./_components/predefined-messages"
 import { MessageList } from "./_components/message-list"
 import { ChatInput } from "./_components/chat-input"
 import { ModelSelector } from "./_components/model-selector"
+import { McpToolSelector } from "./_components/mcp-tool-selector"
 
 export default function AIHelperPage() {
   const getStudyStats = useQuery(api.study.getFullStats)
@@ -28,7 +29,9 @@ export default function AIHelperPage() {
     messagesEndRef,
     selectedModel,
     resolvedModel,
+    selectedMcpTool,
     setSelectedModel,
+    setSelectedMcpTool,
     handleSubmit,
     append,
     stop,
@@ -60,6 +63,11 @@ export default function AIHelperPage() {
             selectedModel={selectedModel}
             resolvedModel={resolvedModel}
             onModelChange={setSelectedModel}
+            disabled={isLoading}
+          />
+          <McpToolSelector
+            selectedTool={selectedMcpTool}
+            onToolChange={setSelectedMcpTool}
             disabled={isLoading}
           />
           <Button
@@ -111,6 +119,7 @@ export default function AIHelperPage() {
             activeModel={resolvedModel}
             coinBalance={coinBalance}
             coinsRequired={coinsRequired}
+            selectedMcpTool={selectedMcpTool}
           />
         </div>
       </div>

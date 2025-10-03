@@ -12,10 +12,34 @@ import { Bot, Loader2, RefreshCw, User } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import rehypeHighlight from "rehype-highlight"
+import { useEffect, useState } from "react"
 
 import { formatMessageContent } from "./message-formatter"
 import { markdownComponents } from "./markdown-components"
 import type { Message } from "./chat-state"
+
+const LOADING_MESSAGES = [
+  "Flipping through my mental notes...",
+  "Consulting the study guides...",
+  "Brewing up some knowledge...",
+  "Highlighting the key points...",
+  "Searching my memory palace...",
+  "Organizing my thoughts...",
+  "Reviewing the material...",
+  "Connecting the dots...",
+  "Pulling an all-nighter for you...",
+  "Cramming for this answer...",
+  "Taking notes from the universe...",
+  "Sharpening my pencils...",
+  "Reading between the lines...",
+  "Gathering study materials...",
+  "Checking my flashcards...",
+  "Synthesizing information...",
+  "Pondering the possibilities...",
+  "Brewing a cup of wisdom...",
+  "Dusting off the textbooks...",
+  "Calculating the perfect response...",
+]
 
 interface MessageListProps {
   messages: Message[]
@@ -34,6 +58,33 @@ export function MessageList({
   onRetry, 
   onClearError 
 }: MessageListProps) {
+  const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0])
+  const [messageIndex, setMessageIndex] = useState(0)
+
+  useEffect(() => {
+    if (!isLoading) {
+      // Reset to random message when loading starts next time
+      setMessageIndex(Math.floor(Math.random() * LOADING_MESSAGES.length))
+      return
+    }
+
+    // Start with a random message
+    const initialIndex = Math.floor(Math.random() * LOADING_MESSAGES.length)
+    setMessageIndex(initialIndex)
+    setLoadingMessage(LOADING_MESSAGES[initialIndex])
+
+    // Change message every 2 seconds while loading
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => {
+        const next = (prev + 1) % LOADING_MESSAGES.length
+        setLoadingMessage(LOADING_MESSAGES[next])
+        return next
+      })
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [isLoading])
+
   return (
     <div className="space-y-3 sm:space-y-4">
       {messages.map((message) => (
@@ -145,11 +196,13 @@ export function MessageList({
       {isLoading && (
         <div className="flex gap-2 sm:gap-3">
           <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-muted shrink-0">
-            <Bot className="h-3 w-3 sm:h-4 sm:w-4" />
+            <Bot className="h-3 w-3 sm:h-4 sm:w-4 animate-pulse" />
           </div>
           <div className="flex items-center gap-2 rounded-lg bg-muted px-3 sm:px-4 py-2 sm:py-3">
             <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-            <span className="text-xs sm:text-sm">Thinking...</span>
+            <span className="text-xs sm:text-sm text-muted-foreground animate-pulse">
+              {loadingMessage}
+            </span>
           </div>
         </div>
       )}
