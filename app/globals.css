@@ -188,9 +188,9 @@ to {
   @apply font-mono text-xs;
 }
 
-/* Inline code - distinct styling */
+/* Inline code - minimal and professional styling */
 .markdown-body code:not(pre code) {
-  @apply rounded bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 text-blue-700 dark:text-blue-400 font-semibold border border-blue-200 dark:border-blue-800;
+  @apply rounded bg-muted/50 px-1.5 py-0.5 font-mono text-xs text-foreground/90 font-normal;
 }
 
 /* Blockquotes - for tips and notes */
