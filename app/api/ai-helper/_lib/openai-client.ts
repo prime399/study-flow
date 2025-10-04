@@ -133,7 +133,7 @@ export interface ChatCompletionOptions {
 export const DEFAULT_COMPLETION_OPTIONS = {
   temperature: 0.7,
   top_p: 0.95,
-  max_tokens: 2048,
+  max_tokens: 64000,
 } as const
 
 const STREAM_REQUIRED_MODELS: ReadonlySet<SupportedModelId> = new Set([

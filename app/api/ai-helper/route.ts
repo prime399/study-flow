@@ -21,9 +21,16 @@ interface McpTool {
   inputSchema?: any
 }
 
-async function fetchAvailableMcpTools(): Promise<McpTool[]> {
+async function fetchAvailableMcpTools(requestUrl?: string): Promise<McpTool[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    // Skip MCP tools in production if no URL is available
+    // MCP tools are typically for local development with MCP servers
+    if (!requestUrl && !process.env.NEXT_PUBLIC_APP_URL) {
+      console.log('Skipping MCP tools fetch - no base URL available (production environment)')
+      return []
+    }
+    
+    const baseUrl = requestUrl || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const response = await fetch(`${baseUrl}/api/ai-helper/mcp-servers`, {
       cache: 'no-store'
     })
@@ -116,8 +123,12 @@ export async function POST(req: Request) {
     // Validate and get OpenAI configuration for the resolved model
     const config = validateOpenAIConfig(routingDecision.resolvedModelId)
 
+    // Get base URL from request for MCP tools fetch
+    const url = new URL(req.url)
+    const baseUrl = `${url.protocol}//${url.host}`
+
     // Fetch all available MCP tools
-    const availableMcpTools = await fetchAvailableMcpTools()
+    const availableMcpTools = await fetchAvailableMcpTools(baseUrl)
 
     // Build system prompt with user context
     const baseSystemPrompt = buildSystemPrompt({ userName, studyStats, groupInfo })
