@@ -147,7 +147,7 @@ export function ModelSelector({ selectedModel, resolvedModel, onModelChange, dis
 
   if (error) {
     return (
-      <div className="flex items-center gap-2 w-full sm:w-auto p-2 bg-destructive/10 text-destructive rounded-md border border-destructive/20">
+      <div className="flex items-center gap-2 w-full p-2 bg-destructive/10 text-destructive rounded-md border border-destructive/20">
         <AlertTriangle className="h-4 w-4 shrink-0" />
         <span className="text-xs">{error}</span>
       </div>
@@ -155,35 +155,35 @@ export function ModelSelector({ selectedModel, resolvedModel, onModelChange, dis
   }
 
   return (
-    <div className="flex items-center gap-2 w-full sm:w-auto">
-      <span className="text-sm text-muted-foreground hidden lg:inline">Model:</span>
+    <div className="flex items-center gap-2 w-full sm:flex-1">
+      <span className="text-sm text-muted-foreground hidden lg:inline shrink-0">Model:</span>
       <Select value={selectedModel} onValueChange={onModelChange} disabled={disabled || isLoading}>
-        <SelectTrigger className="w-full sm:w-[220px] lg:w-[240px] h-9 text-sm">
+        <SelectTrigger className="w-full h-10 text-sm touch-manipulation">
           <SelectValue>
             <div className="flex items-center gap-2 min-w-0">
               <span className="shrink-0">{currentModel?.icon}</span>
-              <div className="flex flex-col min-w-0">
-                <span className="truncate text-xs sm:text-sm">
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="truncate text-xs sm:text-sm font-medium">
                   {isLoading ? 'Loading...' : currentModel?.name}
                 </span>
                 {selectedModel === AUTO_MODEL_ID && resolvedModelInfo && resolvedModelInfo.id !== AUTO_MODEL_ID && !isLoading && (
-                  <span className="hidden sm:inline text-[10px] text-muted-foreground truncate">
+                  <span className="hidden md:inline text-[10px] text-muted-foreground truncate">
                     Routing to {resolvedModelInfo.name}
                   </span>
                 )}
               </div>
               {currentModel?.badge && !isLoading && (
-                <Badge variant={currentModel.badgeVariant} className="text-xs px-1 sm:px-1.5 py-0.5 shrink-0 hidden sm:inline-flex">
+                <Badge variant={currentModel.badgeVariant} className="text-[10px] sm:text-xs px-1 sm:px-1.5 py-0.5 shrink-0">
                   {currentModel.badge}
                 </Badge>
               )}
             </div>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="w-[280px] sm:w-[320px]">
+        <SelectContent className="w-[calc(100vw-2rem)] sm:w-[360px] max-w-md" align="start">
           {availableModels.map((model) => (
-            <SelectItem key={model.id} value={model.id} className="cursor-pointer">
-              <div className="flex flex-col gap-1 py-1 w-full">
+            <SelectItem key={model.id} value={model.id} className="cursor-pointer touch-manipulation py-3">
+              <div className="flex flex-col gap-1.5 w-full">
                 <div className="flex items-center gap-2">
                   {model.icon}
                   <span className="font-medium text-sm">{model.name}</span>
@@ -193,7 +193,7 @@ export function ModelSelector({ selectedModel, resolvedModel, onModelChange, dis
                     </Badge>
                   )}
                 </div>
-                <div className="text-xs text-muted-foreground pl-6">
+                <div className="text-xs text-muted-foreground pl-6 leading-snug">
                   {model.id === AUTO_MODEL_ID && resolvedModelInfo && resolvedModelInfo.id !== AUTO_MODEL_ID
                     ? `Current: ${resolvedModelInfo.name}`
                     : model.description}
@@ -206,4 +206,3 @@ export function ModelSelector({ selectedModel, resolvedModel, onModelChange, dis
     </div>
   )
 }
-

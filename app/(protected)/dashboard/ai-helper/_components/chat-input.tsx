@@ -99,8 +99,8 @@ export function ChatInput({
   }, [activeModel])
 
   return (
-    <div className="">
-      <div className="p-2 sm:p-4">
+    <div className="safe-area-inset-bottom">
+      <div className="p-3 sm:p-4">
         <form onSubmit={onSubmit} className="flex flex-col gap-2">
           {showMcpHint && (
             <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/10">
@@ -133,7 +133,7 @@ export function ChatInput({
                 onKeyDown={handleKeyDown}
                 placeholder="Ask anything... (I can use tools to fetch URLs when needed)"
                 disabled={isLoading || (error != null && !insufficientCoins)}
-                className="min-h-[44px] max-h-[200px] resize-none text-sm sm:text-base pr-12"
+                className="min-h-[48px] max-h-[200px] resize-none text-sm sm:text-base pr-12 touch-manipulation"
                 rows={1}
                 autoFocus
               />
@@ -150,10 +150,10 @@ export function ChatInput({
                   variant="destructive"
                   size="icon"
                   onClick={onStop}
-                  className="h-9 w-9 sm:h-10 sm:w-10"
+                  className="h-10 w-10 sm:h-11 sm:w-11 touch-manipulation"
                   title="Stop generation"
                 >
-                  <StopCircle className="h-4 w-4" />
+                  <StopCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               ) : (
                 hasMessages && (
@@ -165,10 +165,10 @@ export function ChatInput({
                       e.preventDefault()
                       onReload()
                     }}
-                    className="h-9 w-9 sm:h-10 sm:w-10"
+                    className="h-10 w-10 sm:h-11 sm:w-11 touch-manipulation"
                     title="Retry last message"
                   >
-                    <RefreshCw className="h-4 w-4" />
+                    <RefreshCw className="h-4 w-4 sm:h-5 sm:w-5" />
                   </Button>
                 )
               )}
@@ -176,10 +176,10 @@ export function ChatInput({
                 type="submit"
                 size="icon"
                 disabled={isLoading || !input.trim() || insufficientCoins}
-                className="h-9 w-9 sm:h-10 sm:w-10"
+                className="h-10 w-10 sm:h-11 sm:w-11 touch-manipulation"
                 title="Send message (Enter)"
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
           </div>
@@ -211,8 +211,8 @@ export function ChatInput({
       </div>
 
       {/* Powered by footer - responsive */}
-      <div className="border-t bg-muted/30 px-2 sm:px-4 py-2">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 text-xs text-muted-foreground">
+      <div className="border-t bg-muted/30 px-3 sm:px-4 py-2 sm:py-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
               <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>

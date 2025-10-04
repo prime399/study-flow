@@ -48,10 +48,21 @@ export default function AIHelperPage() {
 
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
-      {/* Header section - responsive layout */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 px-4 py-3 shrink-0 border-b">
-        <PageTitle title="MentorMind" />
-        <div className="flex flex-row items-center gap-2">
+      {/* Header section - fully responsive layout */}
+      <div className="flex flex-col gap-2 px-3 py-2 sm:px-4 sm:py-3 shrink-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex items-center justify-between">
+          <PageTitle title="MentorMind" />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearChat}
+            className="gap-1 h-8 px-2 sm:px-3"
+          >
+            <TrashIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="text-xs sm:text-sm">Clear</span>
+          </Button>
+        </div>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <ModelSelector
             selectedModel={selectedModel}
             resolvedModel={resolvedModel}
@@ -63,22 +74,13 @@ export default function AIHelperPage() {
             onToolChange={setSelectedMcpTool}
             disabled={isLoading}
           />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearChat}
-            className="gap-2"
-          >
-            <TrashIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Clear</span>
-          </Button>
         </div>
       </div>
       
-      {/* Chat container - full height minus header */}
+      {/* Chat container - full height minus header with safe area for mobile keyboards */}
       <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
         <div className="flex-1 min-h-0 overflow-hidden">
-          <ScrollArea className="h-full p-2 sm:p-4">
+          <ScrollArea className="h-full p-3 sm:p-4 md:p-6">
             {messages.length === 0 ? (
               <PredefinedMessages 
                 onMessageSelect={(message) => append({ role: "user", content: message })}
@@ -99,7 +101,7 @@ export default function AIHelperPage() {
             )}
           </ScrollArea>
         </div>
-        <div className="shrink-0 border-t bg-background">
+        <div className="shrink-0 border-t bg-background shadow-lg">
           <ChatInput
             input={input}
             setInput={setInput}

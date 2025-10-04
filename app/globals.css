@@ -321,3 +321,41 @@ to {
 .markdown-pre {
   @apply overflow-x-auto rounded-lg bg-zinc-900 dark:bg-zinc-950 p-4 text-sm border border-zinc-800 dark:border-zinc-700;
 }
+
+/* Mobile-Specific Responsive Utilities */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari safe area insets */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Touch-friendly elements */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Improve scroll behavior on mobile */
+@media (max-width: 640px) {
+  .markdown-body pre {
+    @apply text-xs;
+  }
+  
+  .markdown-body code:not(pre code) {
+    @apply text-[11px];
+  }
+  
+  /* Better mobile spacing */
+  .markdown-body h1 {
+    @apply text-lg mt-4 mb-3;
+  }
+  
+  .markdown-body h2 {
+    @apply text-base mt-3 mb-2;
+  }
+  
+  .markdown-body h3 {
+    @apply text-sm mt-2 mb-1.5;
+  }
+}

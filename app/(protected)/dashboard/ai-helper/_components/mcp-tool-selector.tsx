@@ -68,10 +68,10 @@ export function McpToolSelector({ selectedTool, onToolChange, disabled = false }
   }
 
   return (
-    <div className="flex items-center gap-2 w-full sm:w-auto">
-      <span className="text-sm text-muted-foreground hidden lg:inline">MCP Tool:</span>
+    <div className="flex items-center gap-2 w-full sm:flex-1">
+      <span className="text-sm text-muted-foreground hidden lg:inline shrink-0">MCP Tool:</span>
       <Select value={selectedTool} onValueChange={value => onToolChange(value as McpToolId)} disabled={disabled || isLoading}>
-        <SelectTrigger className="w-full sm:w-[240px] lg:w-[260px] h-9 text-sm">
+        <SelectTrigger className="w-full h-10 text-sm touch-manipulation">
           <SelectValue>
             {isLoading ? (
               <div className="flex items-center gap-2">
@@ -81,9 +81,9 @@ export function McpToolSelector({ selectedTool, onToolChange, disabled = false }
             ) : (
               <div className="flex items-center gap-2 min-w-0">
                 <span className="shrink-0">{getToolIcon(activeTool.id)}</span>
-                <span className="truncate text-xs sm:text-sm">{activeTool.label}</span>
+                <span className="truncate text-xs sm:text-sm font-medium flex-1">{activeTool.label}</span>
                 {!activeTool.isStatic && (
-                  <Badge variant="secondary" className="text-xs px-1 sm:px-1.5 py-0.5 shrink-0 hidden sm:inline-flex">
+                  <Badge variant="secondary" className="text-[10px] sm:text-xs px-1 sm:px-1.5 py-0.5 shrink-0">
                     MCP
                   </Badge>
                 )}
@@ -91,10 +91,10 @@ export function McpToolSelector({ selectedTool, onToolChange, disabled = false }
             )}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="w-[280px] sm:w-[320px] max-h-[400px]">
+        <SelectContent className="w-[calc(100vw-2rem)] sm:w-[360px] max-w-md max-h-[60vh]" align="start">
           {allTools.map(tool => (
-            <SelectItem key={tool.id} value={tool.id} className="cursor-pointer">
-              <div className="flex flex-col gap-1 py-1 w-full">
+            <SelectItem key={tool.id} value={tool.id} className="cursor-pointer touch-manipulation py-3">
+              <div className="flex flex-col gap-1.5 w-full">
                 <div className="flex items-center gap-2">
                   {getToolIcon(tool.id)}
                   <span className="font-medium text-sm">{tool.label}</span>
@@ -104,7 +104,7 @@ export function McpToolSelector({ selectedTool, onToolChange, disabled = false }
                     </Badge>
                   )}
                 </div>
-                <div className="text-xs text-muted-foreground pl-6">{tool.description}</div>
+                <div className="text-xs text-muted-foreground pl-6 leading-snug">{tool.description}</div>
               </div>
             </SelectItem>
           ))}
