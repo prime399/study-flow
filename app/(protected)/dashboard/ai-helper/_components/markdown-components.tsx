@@ -74,7 +74,7 @@ export const markdownComponents: Components = {
       return (
         <code
           className={cn(
-            "rounded bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-pink-600 dark:text-pink-400 font-semibold border border-zinc-200 dark:border-zinc-700",
+            "rounded bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 font-mono text-xs text-blue-700 dark:text-blue-400 font-semibold border border-blue-200 dark:border-blue-800",
             className,
           )}
           {...props}
