@@ -305,15 +305,15 @@ export function TodoBoard() {
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">To-Do Board</h2>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground sm:text-base">
+        <div className="flex-1">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-foreground">To-Do Board</h2>
+          <p className="mt-1 max-w-2xl text-xs sm:text-sm lg:text-base text-muted-foreground">
             Plan your study focus, drag tasks between columns, and keep your goals on track.
           </p>
         </div>
-        <Button onClick={() => openCreateDialog()} className="self-start sm:self-auto rounded-full bg-primary/90 px-4 sm:px-5 py-2 shadow-sm transition hover:bg-primary/80 hover:shadow-md">
-          <Plus className="mr-2 h-4 w-4" />
-          New Task
+        <Button onClick={() => openCreateDialog()} className="self-start sm:self-auto w-full sm:w-auto rounded-full bg-primary/90 px-4 sm:px-5 py-2.5 shadow-sm transition hover:bg-primary/80 hover:shadow-md touch-manipulation">
+          <Plus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="font-medium">New Task</span>
         </Button>
       </div>
 
@@ -341,47 +341,47 @@ export function TodoBoard() {
           onMove={handleMove}
           className="space-y-4 sm:space-y-6"
         >
-          <KanbanBoard className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 sm:gap-5 md:gap-6">
+          <KanbanBoard className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 sm:gap-5 md:gap-6">
             {STATUS_CONFIG.map((column) => {
               const tasks = board[column.id]
               return (
                 <KanbanColumn key={column.id} value={column.id} disabled className="flex flex-col">
                   <Card className={cn("group flex h-full flex-col overflow-hidden border border-border/60 bg-card shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg")}>
-                    <CardHeader className={cn("space-y-3 border-b border-border/60 pb-4 text-foreground", "bg-gradient-to-br", column.headerClass)}>
+                    <CardHeader className={cn("space-y-2 sm:space-y-3 border-b border-border/60 pb-3 sm:pb-4 text-foreground", "bg-gradient-to-br", column.headerClass)}>
                       <div className="flex items-center justify-between gap-2">
-                        <div>
-                          <CardTitle className="text-xl font-semibold text-foreground">
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-base sm:text-lg lg:text-xl font-semibold text-foreground truncate">
                             {column.label}
                           </CardTitle>
-                          <p className="text-sm text-muted-foreground">{column.hint}</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground truncate">{column.hint}</p>
                         </div>
-                        <Badge variant="outline" className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary shadow-sm dark:border-primary/40 dark:bg-primary/15 dark:text-primary-foreground">
+                        <Badge variant="outline" className="rounded-lg border border-primary/30 bg-primary/10 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-primary shadow-sm dark:border-primary/40 dark:bg-primary/15 dark:text-primary-foreground shrink-0">
                           {tasks.length}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className={cn("inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm font-semibold text-foreground shadow-sm", column.accent)}>
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                        <span className={cn("inline-flex items-center justify-center gap-1 rounded-lg border px-3 py-2 text-xs sm:text-sm font-semibold text-foreground shadow-sm", column.accent)}>
                           {column.label}
                         </span>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-9 px-4 border-border/70 text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                          className="h-9 sm:h-10 w-full sm:w-auto px-3 sm:px-4 border-border/70 text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary touch-manipulation"
                           onClick={() => openCreateDialog(column.id)}
                         >
-                          <Plus className="mr-1.5 h-4 w-4" />
-                          Add Task
+                          <Plus className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          <span className="text-xs sm:text-sm">Add Task</span>
                         </Button>
                       </div>
                     </CardHeader>
-                    <CardContent className="flex h-full flex-col gap-3 sm:gap-4 bg-muted/30 pt-3 sm:pt-4">
-                      <KanbanColumnContent value={column.id} className="min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] flex flex-1 flex-col gap-3 sm:gap-4 rounded-xl border border-dashed border-transparent bg-background/50 backdrop-blur-sm p-2 transition-colors duration-300">
+                    <CardContent className="flex h-full flex-col gap-2 sm:gap-3 bg-muted/30 pt-2 sm:pt-3">
+                      <KanbanColumnContent value={column.id} className="min-h-[250px] sm:min-h-[350px] lg:min-h-[450px] flex flex-1 flex-col gap-2 sm:gap-3 rounded-xl border border-dashed border-transparent bg-background/50 backdrop-blur-sm p-2 transition-colors duration-300">
                         {isLoading && tasks.length === 0 ? (
-                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background/80 backdrop-blur-sm p-4 sm:p-6 lg:p-8 text-sm font-medium text-muted-foreground">
+                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background/80 backdrop-blur-sm p-4 sm:p-6 text-xs sm:text-sm font-medium text-muted-foreground">
                             Loading tasks...
                           </div>
                         ) : tasks.length === 0 ? (
-                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background/80 backdrop-blur-sm p-4 sm:p-6 lg:p-8 text-center text-sm font-medium text-muted-foreground">
+                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background/80 backdrop-blur-sm p-4 sm:p-6 text-center text-xs sm:text-sm font-medium text-muted-foreground">
                             {column.id === "backlog"
                               ? "Drop ideas here to work on later."
                               : "Nothing here yet. Move a task over when ready."}
@@ -389,7 +389,7 @@ export function TodoBoard() {
                         ) : (
                           tasks.map((task) => (
                             <KanbanItem key={task._id} value={task._id}>
-                              <KanbanItemHandle className="block cursor-grab transition-all duration-300 data-[dragging=true]:rotate-2 data-[dragging=true]:scale-[1.02] data-[dragging=true]:shadow-xl">
+                              <KanbanItemHandle className="block cursor-grab touch-manipulation transition-all duration-300 data-[dragging=true]:rotate-2 data-[dragging=true]:scale-[1.02] data-[dragging=true]:shadow-xl active:cursor-grabbing">
                                 <TaskCard
                                   task={task}
                                   onEdit={openEditDialog}
@@ -481,16 +481,16 @@ function TaskCard({ task, onEdit, onDelete, isOverlay }: TaskCardProps) {
   return (
     <div
       className={cn(
-        "group rounded-xl border border-border/60 bg-card/95 backdrop-blur-sm p-3 sm:p-4 lg:p-5 shadow-md transition-all duration-300",
-        !isOverlay && "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-2xl",
+        "group rounded-xl border border-border/60 bg-card/95 backdrop-blur-sm p-3 sm:p-4 shadow-md transition-all duration-300 touch-manipulation",
+        !isOverlay && "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-2xl active:scale-[0.98]",
         isOverlay && "border-primary/40 shadow-2xl rotate-3 scale-105 backdrop-blur bg-card"
       )}
     >
       <div className="flex items-start justify-between gap-2 sm:gap-3">
-        <div className="flex-1 space-y-2 sm:space-y-3">
-          <p className="line-clamp-2 text-base sm:text-lg font-semibold leading-tight text-foreground">{task.title}</p>
+        <div className="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
+          <p className="line-clamp-2 text-sm sm:text-base lg:text-lg font-semibold leading-tight text-foreground">{task.title}</p>
           {task.description && (
-            <p className="line-clamp-3 text-sm text-muted-foreground leading-relaxed">{task.description}</p>
+            <p className="line-clamp-3 text-xs sm:text-sm text-muted-foreground leading-relaxed">{task.description}</p>
           )}
         </div>
         {!isOverlay && (onEdit || onDelete) && (
@@ -499,23 +499,23 @@ function TaskCard({ task, onEdit, onDelete, isOverlay }: TaskCardProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-full opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-muted/60"
+                className="h-8 w-8 sm:h-9 sm:w-9 rounded-full opacity-100 sm:opacity-0 transition-all duration-200 sm:group-hover:opacity-100 hover:bg-muted/60 shrink-0 touch-manipulation"
               >
                 <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-36 border border-border/60 bg-popover text-popover-foreground shadow-xl"
+              className="w-40 border border-border/60 bg-popover text-popover-foreground shadow-xl"
             >
               {onEdit && (
-                <DropdownMenuItem onClick={() => onEdit(task)} className="hover:bg-muted/60">
+                <DropdownMenuItem onClick={() => onEdit(task)} className="hover:bg-muted/60 cursor-pointer py-2.5">
                   <Pencil className="mr-2 h-4 w-4 text-muted-foreground" /> Edit
                 </DropdownMenuItem>
               )}
               {onDelete && (
                 <DropdownMenuItem
-                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer py-2.5"
                   onClick={() => onDelete(task._id)}
                 >
                   <Trash2 className="mr-2 h-4 w-4" /> Delete
@@ -526,15 +526,15 @@ function TaskCard({ task, onEdit, onDelete, isOverlay }: TaskCardProps) {
         )}
       </div>
 
-      <Separator className="my-4 bg-border/60" />
+      <Separator className="my-3 sm:my-4 bg-border/60" />
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Badge variant="outline" className={cn("rounded-lg px-3 py-1 text-sm font-medium", priority.className)}>
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        <Badge variant="outline" className={cn("rounded-lg px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium", priority.className)}>
           {priority.label} priority
         </Badge>
         {dueLabel && (
-          <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-            <CalendarDays className="h-4 w-4" />
+          <span className="inline-flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm text-muted-foreground">
+            <CalendarDays className="h-3 w-3 sm:h-4 sm:w-4" />
             {dueLabel}
           </span>
         )}
@@ -560,89 +560,101 @@ function TaskDialog({ open, onOpenChange, mode, state, onStateChange, onSubmit, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="mx-4 max-w-lg sm:mx-auto">
+      <DialogContent className="mx-3 sm:mx-4 max-w-lg sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{mode === "create" ? "Create new task" : "Edit task"}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg sm:text-xl">{mode === "create" ? "Create new task" : "Edit task"}</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
             {mode === "create"
-              ? "Add a new item to your Kanban board and assign where it should start."
+              ? "Add a new item to your ToDo board and assign where it should start."
               : "Update the task details or move it to a new column."}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
-          <div className="space-y-2">
-            <Label htmlFor="task-title">Title</Label>
+        <div className="space-y-3 sm:space-y-4 py-2">
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="task-title" className="text-sm sm:text-base">Title</Label>
             <Input
               id="task-title"
               placeholder="Quick summary"
               value={state.title}
               onChange={(event) => handleChange("title", event.target.value)}
+              className="h-10 sm:h-11 text-sm sm:text-base"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="task-description">Description</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="task-description" className="text-sm sm:text-base">Description</Label>
             <Textarea
               id="task-description"
               placeholder="Add context, resources, or acceptance criteria"
               value={state.description}
               onChange={(event) => handleChange("description", event.target.value)}
-              rows={4}
+              rows={3}
+              className="text-sm sm:text-base resize-none"
             />
           </div>
 
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-            <div className="space-y-2">
-              <Label>Status</Label>
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="text-sm sm:text-base">Status</Label>
               <Select value={state.status} onValueChange={(value: StatusId) => handleChange("status", value)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {STATUS_CONFIG.map((column) => (
-                    <SelectItem key={column.id} value={column.id} className="capitalize">
+                    <SelectItem key={column.id} value={column.id} className="capitalize py-2.5 text-sm sm:text-base">
                       {column.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Priority</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="text-sm sm:text-base">Priority</Label>
               <Select
                 value={state.priority}
                 onValueChange={(value: PriorityId) => handleChange("priority", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {(Object.keys(PRIORITY_CONFIG) as PriorityId[]).map((priority) => (
-                    <SelectItem key={priority} value={priority} className="capitalize">
+                    <SelectItem key={priority} value={priority} className="capitalize py-2.5 text-sm sm:text-base">
                       {PRIORITY_CONFIG[priority].label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="task-due">Due date</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="task-due" className="text-sm sm:text-base">Due date</Label>
               <Input
                 type="date"
                 id="task-due"
                 value={state.dueDate}
                 onChange={(event) => handleChange("dueDate", event.target.value)}
+                className="h-10 sm:h-11 text-sm sm:text-base"
               />
             </div>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+        <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+          <Button 
+            variant="ghost" 
+            onClick={() => onOpenChange(false)} 
+            disabled={isSubmitting}
+            className="w-full sm:w-auto h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
+          >
             Cancel
           </Button>
-          <Button onClick={onSubmit} disabled={isSubmitting}>
+          <Button 
+            onClick={onSubmit} 
+            disabled={isSubmitting}
+            className="w-full sm:w-auto h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
