@@ -374,14 +374,14 @@ export function TodoBoard() {
                         </Button>
                       </div>
                     </CardHeader>
-                    <CardContent className="flex h-full flex-col gap-3 sm:gap-4 bg-muted pt-3 sm:pt-4">
-                      <KanbanColumnContent value={column.id} className="min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] flex flex-1 flex-col gap-3 sm:gap-4 rounded-xl border border-dashed border-transparent bg-card p-2 transition-colors duration-300">
+                    <CardContent className="flex h-full flex-col gap-3 sm:gap-4 bg-muted/30 pt-3 sm:pt-4">
+                      <KanbanColumnContent value={column.id} className="min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] flex flex-1 flex-col gap-3 sm:gap-4 rounded-xl border border-dashed border-transparent bg-background/50 backdrop-blur-sm p-2 transition-colors duration-300">
                         {isLoading && tasks.length === 0 ? (
-                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background p-4 sm:p-6 lg:p-8 text-sm font-medium text-muted-foreground">
+                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background/80 backdrop-blur-sm p-4 sm:p-6 lg:p-8 text-sm font-medium text-muted-foreground">
                             Loading tasks...
                           </div>
                         ) : tasks.length === 0 ? (
-                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background p-4 sm:p-6 lg:p-8 text-center text-sm font-medium text-muted-foreground">
+                          <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed border-border/60 bg-background/80 backdrop-blur-sm p-4 sm:p-6 lg:p-8 text-center text-sm font-medium text-muted-foreground">
                             {column.id === "backlog"
                               ? "Drop ideas here to work on later."
                               : "Nothing here yet. Move a task over when ready."}
@@ -481,9 +481,9 @@ function TaskCard({ task, onEdit, onDelete, isOverlay }: TaskCardProps) {
   return (
     <div
       className={cn(
-        "group rounded-xl border border-border/60 bg-card p-3 sm:p-4 lg:p-5 shadow-sm transition-all duration-300",
-        !isOverlay && "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-xl",
-        isOverlay && "border-primary/40 shadow-2xl rotate-3 scale-105 backdrop-blur"
+        "group rounded-xl border border-border/60 bg-card/95 backdrop-blur-sm p-3 sm:p-4 lg:p-5 shadow-md transition-all duration-300",
+        !isOverlay && "hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-2xl",
+        isOverlay && "border-primary/40 shadow-2xl rotate-3 scale-105 backdrop-blur bg-card"
       )}
     >
       <div className="flex items-start justify-between gap-2 sm:gap-3">
