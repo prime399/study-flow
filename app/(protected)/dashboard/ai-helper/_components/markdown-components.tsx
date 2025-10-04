@@ -10,6 +10,24 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react"
 type CodeProps = ComponentPropsWithoutRef<'code'> & { inline?: boolean; children?: ReactNode }
 
 export const markdownComponents: Components = {
+  h1: ({ node, ...props }) => (
+    <h1 className="text-xl sm:text-2xl font-bold mt-4 sm:mt-6 mb-3 sm:mb-4 border-b border-border pb-2" {...props} />
+  ),
+  h2: ({ node, ...props }) => (
+    <h2 className="text-lg sm:text-xl font-bold mt-4 sm:mt-5 mb-2 sm:mb-3 border-b border-border pb-2" {...props} />
+  ),
+  h3: ({ node, ...props }) => (
+    <h3 className="text-base sm:text-lg font-semibold mt-3 sm:mt-4 mb-2" {...props} />
+  ),
+  h4: ({ node, ...props }) => (
+    <h4 className="text-sm sm:text-base font-semibold mt-2 sm:mt-3 mb-1.5 sm:mb-2" {...props} />
+  ),
+  h5: ({ node, ...props }) => (
+    <h5 className="text-sm font-semibold mt-2 mb-1.5" {...props} />
+  ),
+  h6: ({ node, ...props }) => (
+    <h6 className="text-xs sm:text-sm font-semibold mt-2 mb-1.5" {...props} />
+  ),
   p: ({ node, ...props }) => (
     <p className="whitespace-pre-wrap leading-relaxed text-xs sm:text-sm" {...props} />
   ),
@@ -35,19 +53,28 @@ export const markdownComponents: Components = {
   ),
   blockquote: ({ node, ...props }) => (
     <blockquote
-      className="border-l-4 border-border pl-4 italic text-muted-foreground"
+      className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 my-3 italic text-muted-foreground bg-blue-50 dark:bg-blue-950/30 rounded-r"
       {...props}
     />
   ),
+  hr: ({ node, ...props }) => (
+    <hr className="my-4 border-border" {...props} />
+  ),
   pre: ({ node, className, ...props }) => (
-    <pre className={cn("markdown-pre", className)} {...props} />
+    <pre 
+      className={cn(
+        "overflow-x-auto rounded-lg bg-zinc-900 dark:bg-zinc-950 p-4 my-4 text-sm border border-zinc-800 dark:border-zinc-700 shadow-lg",
+        className
+      )} 
+      {...props} 
+    />
   ),
   code: ({ inline, className, children, ...props }: CodeProps) => {
     if (inline) {
       return (
         <code
           className={cn(
-            "rounded bg-muted px-1.5 py-0.5 font-mono text-xs",
+            "rounded bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-pink-600 dark:text-pink-400 font-semibold border border-zinc-200 dark:border-zinc-700",
             className,
           )}
           {...props}
@@ -59,7 +86,7 @@ export const markdownComponents: Components = {
 
     return (
       <code
-        className={cn("block font-mono text-sm leading-relaxed", className)}
+        className={cn("block font-mono text-sm leading-relaxed text-zinc-100", className)}
         {...props}
       >
         {children}
