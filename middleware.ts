@@ -19,6 +19,14 @@ const isGoogleCalendarOAuthRoute = createRouteMatcher([
   "/api/google-calendar/callback"
 ])
 
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL
+
+if (!convexUrl) {
+  throw new Error(
+    "NEXT_PUBLIC_CONVEX_URL is required for Convex auth middleware. Set it locally and in Vercel project environment variables."
+  )
+}
+
 // Create Convex middleware handler (without Auth0 logic)
 const convexMiddleware = convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
   // Handle Convex auth routes
@@ -31,6 +39,8 @@ const convexMiddleware = convexAuthNextjsMiddleware(async (request, { convexAuth
 
   // For all other routes, return a standard response
   return NextResponse.next()
+}, {
+  convexUrl,
 })
 
 // Main middleware function - handle Auth0 and Spotify OAuth BEFORE Convex
